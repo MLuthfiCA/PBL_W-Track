@@ -12,50 +12,68 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // Data statistik (nantinya dari database)
+        // Data statistik sementara.
+        // Nantinya akan diambil dari database setelah
+        // fitur equipment dan transaksi selesai dibuat.
         $stats = [
-            'total'     => 248,
-            'digunakan' => 176,
-            'perbaikan' => 18,
-            'tersedia'  => 54,
+            'total'    => 248,
+            'keluar'   => 176,
+            'workshop' => 72,
         ];
 
-        // Data equipment terbaru (nantinya dari model Equipment)
+        // Data equipment terbaru sementara.
+        // Nantinya akan diambil dari tabel equipment.
         $equipmentTerbaru = [
             [
                 'nama'   => 'Gerinda Tangan 4 Inch',
                 'kode'   => 'TW-00124',
                 'lokasi' => 'Meja Kerja 2',
-                'status' => 'Digunakan',
+                'status' => 'Keluar',
             ],
             [
                 'nama'   => 'Solder Digital 60W',
                 'kode'   => 'TW-00089',
-                'lokasi' => 'Meja Kerja 1',
-                'status' => 'Perbaikan',
+                'lokasi' => 'Workshop',
+                'status' => 'Di Workshop',
             ],
             [
                 'nama'   => 'Multitester Digital',
                 'kode'   => 'TW-00156',
-                'lokasi' => 'Rak Alat 3',
-                'status' => 'Tersedia',
+                'lokasi' => 'Workshop',
+                'status' => 'Di Workshop',
             ],
             [
                 'nama'   => 'Bor Listrik 13mm',
                 'kode'   => 'TW-00211',
                 'lokasi' => 'Meja Kerja 4',
-                'status' => 'Digunakan',
+                'status' => 'Keluar',
             ],
         ];
 
-        // Aktivitas terbaru (nantinya dari model Aktivitas)
+        // Aktivitas terbaru sementara.
+        // Nantinya akan berasal dari transaksi equipment.
         $aktivitas = [
-            ['text' => 'Gerinda tangan dipindahkan ke Meja Kerja 2', 'time' => '1 jam lalu'],
-            ['text' => 'Solder dipindahkan ke Meja Kerja 2',          'time' => '2 jam lalu'],
-            ['text' => 'Multitester ditandai tersedia',                'time' => '3 jam lalu'],
-            ['text' => 'Bor Listrik 13mm masuk perbaikan',             'time' => '5 jam lalu'],
+            [
+                'text' => 'Gerinda Tangan 4 Inch keluar dari workshop',
+                'time' => '1 jam lalu',
+            ],
+            [
+                'text' => 'Solder Digital 60W masuk kembali ke workshop',
+                'time' => '2 jam lalu',
+            ],
+            [
+                'text' => 'Multitester Digital masuk ke workshop',
+                'time' => '3 jam lalu',
+            ],
+            [
+                'text' => 'Bor Listrik 13mm keluar dari workshop',
+                'time' => '5 jam lalu',
+            ],
         ];
 
-        return view('dashboard.index', compact('stats', 'equipmentTerbaru', 'aktivitas'));
+        return view(
+            'dashboard.index',
+            compact('stats', 'equipmentTerbaru', 'aktivitas')
+        );
     }
 }
