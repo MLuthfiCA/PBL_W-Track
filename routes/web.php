@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +27,10 @@ Route::get('/password/reset', function () {
     return redirect()->route('login')->with('error', 'Fitur reset password belum tersedia.');
 })->name('password.request');
 
+// ── TRANSAKSI & RFID API (WTR-03) ───────────────────────
+// Endpoint ini dibuka agar dapat dipanggil oleh simulasi/sensor RFID tanpa terhalang auth session
+Route::post('/scan-out', [TransactionController::class, 'scanOut'])->name('scan.out');
+
 // ── AUTHENTICATED ROUTES ────────────────────────────────
 Route::middleware('auth')->group(function () {
 
@@ -42,4 +47,3 @@ Route::middleware('auth')->group(function () {
     Route::get('/pengaturan',  fn() => view('coming-soon', ['page' => 'Pengaturan']))->name('pengaturan.index');
     Route::get('/notifikasi',  fn() => view('coming-soon', ['page' => 'Notifikasi']))->name('notifikasi.index');
 });
-
