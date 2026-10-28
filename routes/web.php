@@ -28,9 +28,10 @@ Route::get('/password/reset', function () {
     return redirect()->route('login')->with('error', 'Fitur reset password belum tersedia.');
 })->name('password.request');
 
-// ── TRANSAKSI & RFID API (WTR-03) ───────────────────────
+// ── TRANSAKSI & RFID API (WTR-03 & WTR-04) ──────────────
 // Endpoint ini dibuka agar dapat dipanggil oleh simulasi/sensor RFID tanpa terhalang auth session
 Route::post('/scan-out', [TransactionController::class, 'scanOut'])->name('scan.out');
+Route::post('/scan-in', [TransactionController::class, 'scanIn'])->name('scan.in');
 
 // ── AUTHENTICATED ROUTES ────────────────────────────────
 Route::middleware('auth')->group(function () {
