@@ -41,9 +41,10 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // ── MASTER DATA EQUIPMENT (WTR-02) ───────────────────
+    Route::resource('equipment', EquipmentController::class);
+
     // Placeholder routes (akan diisi di sprint berikutnya)
-    Route::get('/equipment', [EquipmentController::class, 'index'])
-        ->name('equipment.index');    
     Route::get('/pemeliharaan', fn() => view('coming-soon', ['page' => 'Pemeliharaan']))->name('pemeliharaan.index');
     Route::get('/laporan',     fn() => view('coming-soon', ['page' => 'Laporan']))->name('laporan.index');
     Route::get('/pengaturan',  fn() => view('coming-soon', ['page' => 'Pengaturan']))->name('pengaturan.index');
