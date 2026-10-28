@@ -1,3 +1,4 @@
+```php
 @extends('layouts.app')
 
 @section('title', 'Dashboard')
@@ -88,7 +89,10 @@
 
     .sidebar-nav::-webkit-scrollbar { width: 4px; }
     .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
-    .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .sidebar-nav::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+    }
 
     .nav-list {
         list-style: none;
@@ -325,7 +329,7 @@
     /* ── STAT CARDS ──────────────────────────── */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 16px;
         margin-bottom: 20px;
     }
@@ -359,7 +363,9 @@
         border-color: rgba(0,188,212,0.3);
     }
 
-    .stat-card:hover::after { opacity: 1; }
+    .stat-card:hover::after {
+        opacity: 1;
+    }
 
     .stat-header {
         display: flex;
@@ -384,10 +390,20 @@
         font-size: 17px;
     }
 
-    .stat-icon.total   { background: #EFF6FF; color: #3B82F6; }
-    .stat-icon.used    { background: #FFFBEB; color: var(--status-used); }
-    .stat-icon.repair  { background: #FEF2F2; color: var(--status-repair); }
-    .stat-icon.avail   { background: #F0FDF4; color: var(--status-available); }
+    .stat-icon.total {
+        background: #EFF6FF;
+        color: #3B82F6;
+    }
+
+    .stat-icon.out {
+        background: #FEF2F2;
+        color: #DC2626;
+    }
+
+    .stat-icon.workshop {
+        background: #F0FDF4;
+        color: #059669;
+    }
 
     .stat-value {
         font-size: 32px;
@@ -403,8 +419,13 @@
         margin-top: 2px;
     }
 
-    .stat-sub.warning { color: #F59E0B; }
-    .stat-sub.success { color: #10B981; }
+    .stat-sub.warning {
+        color: #DC2626;
+    }
+
+    .stat-sub.success {
+        color: #059669;
+    }
 
     /* ── BOTTOM GRID ─────────────────────────── */
     .bottom-grid {
@@ -456,32 +477,23 @@
         stroke-width: 18;
     }
 
-    .donut-used {
+    .donut-out {
         fill: none;
-        stroke: var(--primary);
+        stroke: #EF4444;
         stroke-width: 18;
         stroke-linecap: round;
         stroke-dasharray: 251.2;
-        stroke-dashoffset: 75.36; /* 70% used → 251.2 * 0.30 offset = 75.36 */
+        stroke-dashoffset: 75.36;
         transition: stroke-dashoffset 1s ease;
     }
 
-    .donut-avail {
+    .donut-workshop {
         fill: none;
         stroke: #6EE7B7;
         stroke-width: 18;
+        stroke-linecap: round;
         stroke-dasharray: 251.2;
-        stroke-dashoffset: 226.08; /* 10% avail → offset = 251.2 * 0.90 */
-        opacity: 0.8;
-        transition: stroke-dashoffset 1s ease;
-    }
-
-    .donut-repair {
-        fill: none;
-        stroke: #FCA5A5;
-        stroke-width: 18;
-        stroke-dasharray: 251.2;
-        stroke-dashoffset: 243.66; /* 3% repair */
+        stroke-dashoffset: 226.08;
         opacity: 0.8;
         transition: stroke-dashoffset 1s ease;
     }
@@ -536,9 +548,13 @@
         flex-shrink: 0;
     }
 
-    .dot-used  { background: var(--primary); }
-    .dot-avail { background: #6EE7B7; }
-    .dot-repair{ background: #FCA5A5; }
+    .dot-out {
+        background: #EF4444;
+    }
+
+    .dot-workshop {
+        background: #6EE7B7;
+    }
 
     .legend-val {
         font-weight: 700;
@@ -553,7 +569,9 @@
         margin-bottom: 16px;
     }
 
-    .activity-header .section-title { margin-bottom: 0; }
+    .activity-header .section-title {
+        margin-bottom: 0;
+    }
 
     .link-all {
         font-size: 12.5px;
@@ -620,7 +638,9 @@
         border-bottom: 1px solid var(--border);
     }
 
-    .table-header .section-title { margin-bottom: 0; }
+    .table-header .section-title {
+        margin-bottom: 0;
+    }
 
     .data-table {
         width: 100%;
@@ -650,7 +670,9 @@
         vertical-align: middle;
     }
 
-    .data-table tbody tr:last-child td { border-bottom: none; }
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
 
     .data-table tbody tr {
         transition: background var(--transition);
@@ -682,17 +704,27 @@
         letter-spacing: 0.2px;
     }
 
-    .badge-used    { background: #FFFBEB; color: #D97706; }
-    .badge-avail   { background: #F0FDF4; color: #059669; }
-    .badge-repair  { background: #FEF2F2; color: #DC2626; }
+    .badge-out {
+        background: #FEF2F2;
+        color: #DC2626;
+    }
+
+    .badge-workshop {
+        background: #F0FDF4;
+        color: #059669;
+    }
 
     /* ── RESPONSIVE ──────────────────────────── */
     @media (max-width: 1200px) {
-        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 
     @media (max-width: 900px) {
-        .bottom-grid { grid-template-columns: 1fr; }
+        .bottom-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     @media (max-width: 768px) {
@@ -739,14 +771,26 @@
     }
 
     @media (max-width: 480px) {
-        .stats-grid { grid-template-columns: 1fr; }
-        .status-chart-wrapper { flex-direction: column; }
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .status-chart-wrapper {
+            flex-direction: column;
+        }
     }
 
     /* ── ANIMATIONS ──────────────────────────── */
     @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(14px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(14px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .stat-card {
@@ -756,9 +800,9 @@
     .stat-card:nth-child(1) { animation-delay: 0.05s; }
     .stat-card:nth-child(2) { animation-delay: 0.10s; }
     .stat-card:nth-child(3) { animation-delay: 0.15s; }
-    .stat-card:nth-child(4) { animation-delay: 0.20s; }
 
-    .section-card, .table-card {
+    .section-card,
+    .table-card {
         animation: fadeUp 0.5s ease 0.25s both;
     }
 </style>
@@ -779,25 +823,34 @@
                 <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">
                     <i class="ri-menu-line"></i>
                 </button>
+
                 <div class="topbar-title">
                     <h2>Dashboard</h2>
-                    <p>Ringkasan operasional equipment</p>
+                    <p>Ringkasan monitoring equipment</p>
                 </div>
             </div>
 
             <div class="topbar-right">
-                <a href="{{ route('notifikasi.index') }}" class="notif-btn" id="notifBtn" aria-label="Notifikasi">
+                <a href="{{ route('notifikasi.index') }}"
+                   class="notif-btn"
+                   id="notifBtn"
+                   aria-label="Notifikasi">
                     <i class="ri-notification-3-line"></i>
                     <span class="notif-badge"></span>
                 </a>
 
                 <div class="user-info" id="userMenu">
-                    <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
+                    <div class="user-avatar">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                    </div>
+
                     <div class="user-details">
                         <span class="user-name">{{ Auth::user()->name }}</span>
                         <span class="user-role">Administrator</span>
                     </div>
-                    <i class="ri-arrow-down-s-line" style="color: var(--text-muted); font-size: 16px;"></i>
+
+                    <i class="ri-arrow-down-s-line"
+                       style="color: var(--text-muted); font-size: 16px;"></i>
                 </div>
             </div>
         </header>
@@ -807,53 +860,70 @@
 
             <!-- ── STAT CARDS ───────────────────── -->
             <div class="stats-grid">
+
                 <!-- Total Equipment -->
                 <div class="stat-card">
                     <div class="stat-header">
                         <span class="stat-label">Total Equipment</span>
-                        <div class="stat-icon total"><i class="ri-archive-line"></i></div>
+
+                        <div class="stat-icon total">
+                            <i class="ri-archive-line"></i>
+                        </div>
                     </div>
+
                     <div>
-                        <div class="stat-value">{{ $stats['total'] }}</div>
-                        <div class="stat-sub">12 kategori</div>
+                        <div class="stat-value">
+                            {{ $stats['total'] }}
+                        </div>
+
+                        <div class="stat-sub">
+                            Seluruh equipment terdaftar
+                        </div>
                     </div>
                 </div>
 
-                <!-- Sedang Digunakan -->
+                <!-- Equipment Keluar -->
                 <div class="stat-card">
                     <div class="stat-header">
-                        <span class="stat-label">Sedang Digunakan</span>
-                        <div class="stat-icon used"><i class="ri-pulse-line"></i></div>
+                        <span class="stat-label">Equipment Keluar</span>
+
+                        <div class="stat-icon out">
+                            <i class="ri-logout-box-line"></i>
+                        </div>
                     </div>
+
                     <div>
-                        <div class="stat-value">{{ $stats['digunakan'] }}</div>
-                        <div class="stat-sub">{{ $stats['total'] > 0 ? round(($stats['digunakan'] / $stats['total']) * 100) : 0 }}% dari total</div>
+                        <div class="stat-value">
+                            {{ $stats['keluar'] }}
+                        </div>
+
+                        <div class="stat-sub warning">
+                            {{ $stats['total'] > 0 ? round(($stats['keluar'] / $stats['total']) * 100) : 0 }}% dari total
+                        </div>
                     </div>
                 </div>
 
-                <!-- Dalam Perbaikan -->
+                <!-- Equipment Di Workshop -->
                 <div class="stat-card">
                     <div class="stat-header">
-                        <span class="stat-label">Dalam Perbaikan</span>
-                        <div class="stat-icon repair"><i class="ri-tools-line"></i></div>
+                        <span class="stat-label">Di Workshop</span>
+
+                        <div class="stat-icon workshop">
+                            <i class="ri-home-office-line"></i>
+                        </div>
                     </div>
+
                     <div>
-                        <div class="stat-value">{{ $stats['perbaikan'] }}</div>
-                        <div class="stat-sub warning">7 perlu perhatian</div>
+                        <div class="stat-value">
+                            {{ $stats['workshop'] }}
+                        </div>
+
+                        <div class="stat-sub success">
+                            Sedang berada di workshop
+                        </div>
                     </div>
                 </div>
 
-                <!-- Tersedia -->
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <span class="stat-label">Tersedia</span>
-                        <div class="stat-icon avail"><i class="ri-checkbox-circle-line"></i></div>
-                    </div>
-                    <div>
-                        <div class="stat-value">{{ $stats['tersedia'] }}</div>
-                        <div class="stat-sub success">Siap digunakan</div>
-                    </div>
-                </div>
             </div>
 
             <!-- ── BOTTOM GRID ──────────────────── -->
@@ -861,79 +931,140 @@
 
                 <!-- Status Equipment -->
                 <div class="section-card">
-                    <div class="section-title">Status Equipment</div>
+                    <div class="section-title">
+                        Status Equipment
+                    </div>
+
                     <div class="status-chart-wrapper">
+
                         <div class="donut-container">
                             <svg class="donut-svg" viewBox="0 0 100 100">
-                                <circle class="donut-track" cx="50" cy="50" r="40"/>
-                                <circle class="donut-used"   cx="50" cy="50" r="40"/>
-                                <circle class="donut-avail"  cx="50" cy="50" r="40"/>
-                                <circle class="donut-repair" cx="50" cy="50" r="40"/>
+                                <circle
+                                    class="donut-track"
+                                    cx="50"
+                                    cy="50"
+                                    r="40"
+                                />
+
+                                <circle
+                                    class="donut-out"
+                                    cx="50"
+                                    cy="50"
+                                    r="40"
+                                />
+
+                                <circle
+                                    class="donut-workshop"
+                                    cx="50"
+                                    cy="50"
+                                    r="40"
+                                />
                             </svg>
+
                             <div class="donut-center">
-                                <div class="donut-pct">71%</div>
-                                <div class="donut-desc">digunakan</div>
+                                <div class="donut-pct">
+                                    {{ $stats['total'] > 0 ? round(($stats['keluar'] / $stats['total']) * 100) : 0 }}%
+                                </div>
+
+                                <div class="donut-desc">
+                                    equipment keluar
+                                </div>
                             </div>
                         </div>
 
                         <div class="status-legend">
+
+                            <!-- Keluar -->
                             <div class="legend-item">
                                 <div class="legend-dot-label">
-                                    <div class="legend-dot dot-used"></div>
-                                    Digunakan
+                                    <div class="legend-dot dot-out"></div>
+                                    Equipment Keluar
                                 </div>
-                                <span class="legend-val">{{ $stats['digunakan'] }}</span>
+
+                                <span class="legend-val">
+                                    {{ $stats['keluar'] }}
+                                </span>
                             </div>
+
+                            <!-- Di Workshop -->
                             <div class="legend-item">
                                 <div class="legend-dot-label">
-                                    <div class="legend-dot dot-avail"></div>
-                                    Tersedia
+                                    <div class="legend-dot dot-workshop"></div>
+                                    Di Workshop
                                 </div>
-                                <span class="legend-val">{{ $stats['tersedia'] }}</span>
+
+                                <span class="legend-val">
+                                    {{ $stats['workshop'] }}
+                                </span>
                             </div>
-                            <div class="legend-item">
-                                <div class="legend-dot-label">
-                                    <div class="legend-dot dot-repair"></div>
-                                    Perbaikan
-                                </div>
-                                <span class="legend-val">{{ $stats['perbaikan'] }}</span>
-                            </div>
+
                         </div>
                     </div>
                 </div>
 
                 <!-- Aktivitas Terbaru -->
                 <div class="section-card">
+
                     <div class="activity-header">
-                        <div class="section-title">Aktivitas Terbaru</div>
-                        <a href="{{ route('laporan.index') }}" class="link-all">Lihat semua</a>
+                        <div class="section-title">
+                            Aktivitas Terbaru
+                        </div>
+
+                        <a href="{{ route('laporan.index') }}"
+                           class="link-all">
+                            Lihat semua
+                        </a>
                     </div>
 
                     <div class="activity-list">
+
                         @forelse($aktivitas as $item)
+
                         <div class="activity-item">
                             <div class="activity-dot"></div>
+
                             <div>
-                                <div class="activity-text">{{ $item['text'] }}</div>
-                                <div class="activity-time">{{ $item['time'] }}</div>
+                                <div class="activity-text">
+                                    {{ $item['text'] }}
+                                </div>
+
+                                <div class="activity-time">
+                                    {{ $item['time'] }}
+                                </div>
                             </div>
                         </div>
+
                         @empty
-                        <p style="color:var(--text-muted); font-size:13px;">Belum ada aktivitas terbaru.</p>
+
+                        <p style="color:var(--text-muted); font-size:13px;">
+                            Belum ada aktivitas terbaru.
+                        </p>
+
                         @endforelse
+
                     </div>
                 </div>
+
             </div>
 
             <!-- ── EQUIPMENT TABLE ──────────────── -->
             <div class="table-card">
+
                 <div class="table-header">
-                    <div class="section-title">Equipment Terbaru</div>
-                    <a href="{{ route('equipment.index') }}" class="link-all">Lihat semua equipment</a>
+                    <div class="section-title">
+                        Equipment Terbaru
+                    </div>
+
+                    <a href="{{ route('equipment.index') }}"
+                       class="link-all">
+                        Lihat semua equipment
+                    </a>
                 </div>
 
                 <div style="overflow-x: auto;">
+
                     <table class="data-table">
+
                         <thead>
                             <tr>
                                 <th>Nama Equipment</th>
@@ -942,36 +1073,67 @@
                                 <th>Status</th>
                             </tr>
                         </thead>
+
                         <tbody>
+
                             @forelse($equipmentTerbaru as $eq)
+
                             @php
                                 $badgeClass = match($eq['status']) {
-                                    'Digunakan' => 'badge-used',
-                                    'Perbaikan' => 'badge-repair',
-                                    'Tersedia'  => 'badge-avail',
-                                    default     => 'badge-avail',
+                                    'Keluar'       => 'badge-out',
+                                    'Di Workshop'  => 'badge-workshop',
+                                    default        => 'badge-workshop',
                                 };
                             @endphp
+
                             <tr>
-                                <td><span class="equipment-name">{{ $eq['nama'] }}</span></td>
-                                <td><span class="equipment-code">{{ $eq['kode'] }}</span></td>
-                                <td>{{ $eq['lokasi'] }}</td>
-                                <td><span class="badge {{ $badgeClass }}">{{ $eq['status'] }}</span></td>
+
+                                <td>
+                                    <span class="equipment-name">
+                                        {{ $eq['nama'] }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="equipment-code">
+                                        {{ $eq['kode'] }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ $eq['lokasi'] }}
+                                </td>
+
+                                <td>
+                                    <span class="badge {{ $badgeClass }}">
+                                        {{ $eq['status'] }}
+                                    </span>
+                                </td>
+
                             </tr>
+
                             @empty
+
                             <tr>
-                                <td colspan="4" style="text-align:center; color:var(--text-muted); padding:28px;">Belum ada data equipment.</td>
+                                <td colspan="4"
+                                    style="text-align:center; color:var(--text-muted); padding:28px;">
+                                    Belum ada data equipment.
+                                </td>
                             </tr>
+
                             @endforelse
+
                         </tbody>
+
                     </table>
+
                 </div>
             </div>
 
         </main>
-    </div><!-- /main-content -->
+    </div>
 
-</div><!-- /app-wrapper -->
+</div>
 @endsection
 
 @section('scripts')
@@ -982,8 +1144,15 @@
     const sidebarClose = document.getElementById('sidebarClose');
     const overlay      = document.getElementById('sidebarOverlay');
 
-    function openSidebar()  { sidebar.classList.add('open'); overlay.classList.add('open'); }
-    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+    function openSidebar() {
+        sidebar?.classList.add('open');
+        overlay?.classList.add('open');
+    }
+
+    function closeSidebar() {
+        sidebar?.classList.remove('open');
+        overlay?.classList.remove('open');
+    }
 
     hamburgerBtn?.addEventListener('click', openSidebar);
     sidebarClose?.addEventListener('click', closeSidebar);
@@ -991,10 +1160,18 @@
 
     // Donut chart animation on load
     window.addEventListener('load', () => {
-        const circles = document.querySelectorAll('.donut-used, .donut-avail, .donut-repair');
-        circles.forEach(c => {
-            const offset = parseFloat(c.style.strokeDashoffset || c.getAttribute('stroke-dashoffset') || getComputedStyle(c).strokeDashoffset);
+        const circles = document.querySelectorAll(
+            '.donut-out, .donut-workshop'
+        );
+
+        circles.forEach(circle => {
+            const offset = parseFloat(
+                circle.style.strokeDashoffset ||
+                circle.getAttribute('stroke-dashoffset') ||
+                getComputedStyle(circle).strokeDashoffset
+            );
         });
     });
 </script>
 @endsection
+```
