@@ -4,26 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Equipment extends Model
 {
     use HasFactory;
 
-    protected $table = 'equipment';
+    protected $table = 'equipments';
 
     protected $fillable = [
-        'kode_equipment',
-        'nama_equipment',
-        'lokasi',
+        'rfid_uid',
+        'name',
+        'category',
         'status',
     ];
 
-    /**
-     * Satu equipment dapat memiliki banyak transaksi.
-     */
-    public function transaksi(): HasMany
+    // Relasi: Satu equipment bisa memiliki banyak riwayat transaksi
+    public function transactions()
     {
-        return $this->hasMany(Transaksi::class, 'equipment_id');
+        return $this->hasMany(Transaction::class);
     }
 }
