@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Equipment;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,49 +14,54 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // Data statistik (nantinya dari database)
+        // ── Statistik dari database ────────────────────────
+        $total     = Equipment::count();
+        $digunakan = Equipment::where('status', 'borrowed')->count();
+        $tersedia  = Equipment::where('status', 'available')->count();
+        $perbaikan = 0; // Status 'perbaikan' belum ada di tabel equipments
+
         $stats = [
-            'total'     => 248,
-            'digunakan' => 176,
-            'perbaikan' => 18,
-            'tersedia'  => 54,
+            'total'     => $total,
+            'digunakan' => $digunakan,
+            'perbaikan' => $perbaikan,
+            'tersedia'  => $tersedia,
         ];
 
-        // Data equipment terbaru (nantinya dari model Equipment)
-        $equipmentTerbaru = [
-            [
-                'nama'   => 'Gerinda Tangan 4 Inch',
-                'kode'   => 'TW-00124',
-                'lokasi' => 'Meja Kerja 2',
-                'status' => 'Digunakan',
-            ],
-            [
-                'nama'   => 'Solder Digital 60W',
-                'kode'   => 'TW-00089',
-                'lokasi' => 'Meja Kerja 1',
-                'status' => 'Perbaikan',
-            ],
-            [
-                'nama'   => 'Multitester Digital',
-                'kode'   => 'TW-00156',
-                'lokasi' => 'Rak Alat 3',
-                'status' => 'Tersedia',
-            ],
-            [
-                'nama'   => 'Bor Listrik 13mm',
-                'kode'   => 'TW-00211',
-                'lokasi' => 'Meja Kerja 4',
-                'status' => 'Digunakan',
-            ],
-        ];
+        // ── Equipment terbaru (5 terakhir ditambahkan) ─────
+        $equipmentTerbaru = Equipment::latest()
+            ->take(5)
+            ->get()
+            ->map(function ($eq) {
+                $statusLabel = match ($eq->status) {
+                    'borrowed'  => 'Digunakan',
+                    'available' => 'Tersedia',
+                    default     => 'Tersedia',
+                };
 
-        // Aktivitas terbaru (nantinya dari model Aktivitas)
-        $aktivitas = [
-            ['text' => 'Gerinda tangan dipindahkan ke Meja Kerja 2', 'time' => '1 jam lalu'],
-            ['text' => 'Solder dipindahkan ke Meja Kerja 2',          'time' => '2 jam lalu'],
-            ['text' => 'Multitester ditandai tersedia',                'time' => '3 jam lalu'],
-            ['text' => 'Bor Listrik 13mm masuk perbaikan',             'time' => '5 jam lalu'],
-        ];
+                return [
+                    'nama'   => $eq->name,
+                    'kode'   => $eq->rfid_uid,
+                    'lokasi' => $eq->category,
+                    'status' => $statusLabel,
+                ];
+            });
+
+        // ── Aktivitas terbaru (10 transaksi terakhir) ──────
+        $aktivitas = Transaction::with('equipment')
+            ->latest()
+            ->take(10)
+            ->get()
+            ->map(function ($trx) {
+                $equipmentName = $trx->equipment->name ?? 'Equipment tidak diketahui';
+                $action = $trx->type === 'out'
+                    ? "{$equipmentName} dipinjam (keluar)"
+                    : "{$equipmentName} dikembalikan (masuk)";
+
+                return [
+                    'text' => $action,
+                    'time' => $trx->created_at->diffForHumans(),
+                ];
+            });
 
         return view('dashboard.index', compact('stats', 'equipmentTerbaru', 'aktivitas'));
     }
