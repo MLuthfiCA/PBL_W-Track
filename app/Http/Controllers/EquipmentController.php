@@ -12,8 +12,8 @@ class EquipmentController extends Controller
      */
     public function index()
     {
-        $equipments = Equipment::orderBy('created_at', 'desc')->get();
-        return view('equipment.index', compact('equipments'));
+        $equipment = Equipment::orderBy('created_at', 'desc')->get();
+        return view('equipment.index', compact('equipment'));
     }
 
     /**
@@ -53,7 +53,14 @@ class EquipmentController extends Controller
             'name'        => 'required|string|max:255',
             'category'    => 'required|string|max:255',
             'rfid_uid'    => 'required|string|max:255|unique:equipments,rfid_uid,' . $id,
-            'status'      => 'required|in:available,borrowed,maintenance',
+            'status'      => 'required|in:available,borrowed',
+        ], [
+            'name.required'     => 'Nama equipment wajib diisi.',
+            'category.required' => 'Kategori wajib diisi.',
+            'rfid_uid.required' => 'UID Tag RFID wajib diisi.',
+            'rfid_uid.unique'   => 'UID RFID ini sudah terdaftar pada alat lain!',
+            'status.required'   => 'Status wajib dipilih.',
+            'status.in'         => 'Status tidak valid.',
         ]);
 
         $equipment->update($validated);
