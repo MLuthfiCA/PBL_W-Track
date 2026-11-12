@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\EquipmentController;
+use App\Http\Controllers\PemeliharaanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +30,6 @@ Route::get('/password/reset', function () {
 })->name('password.request');
 
 // ── TRANSAKSI & RFID API (WTR-03) ───────────────────────
-// Endpoint ini dibuka agar dapat dipanggil oleh simulasi/sensor RFID tanpa terhalang auth session
 Route::post('/scan-out', [TransactionController::class, 'scanOut'])->name('scan.out');
 
 // ── AUTHENTICATED ROUTES ────────────────────────────────
@@ -44,8 +44,12 @@ Route::middleware('auth')->group(function () {
     // ── MASTER DATA EQUIPMENT (WTR-02) ───────────────────
     Route::resource('equipment', EquipmentController::class);
 
+    // ── PEMELIHARAAN ─────────────────────────────────────
+    Route::get('/pemeliharaan', [PemeliharaanController::class, 'index'])->name('pemeliharaan.index');
+    Route::post('/pemeliharaan/masuk', [PemeliharaanController::class, 'masukPerbaikan'])->name('pemeliharaan.masuk');
+    Route::put('/pemeliharaan/{id}/selesai', [PemeliharaanController::class, 'selesaiPerbaikan'])->name('pemeliharaan.selesai');
+
     // Placeholder routes (akan diisi di sprint berikutnya)
-    Route::get('/pemeliharaan', fn() => view('coming-soon', ['page' => 'Pemeliharaan']))->name('pemeliharaan.index');
     Route::get('/laporan',     fn() => view('coming-soon', ['page' => 'Laporan']))->name('laporan.index');
     Route::get('/pengaturan',  fn() => view('coming-soon', ['page' => 'Pengaturan']))->name('pengaturan.index');
     Route::get('/notifikasi',  fn() => view('coming-soon', ['page' => 'Notifikasi']))->name('notifikasi.index');

@@ -23,11 +23,13 @@ class EquipmentController extends Controller
     {
         $validated = $request->validate([
             'name'        => 'required|string|max:255',
-            'category'    => 'required|string|max:255',
+            'category'    => 'required|string|max:255|in:Hand Tools,Power Tools,Measuring Tools,Cutting Tools,Welding Equipment,Safety Equipment,Pneumatic Tools,Hydraulic Tools,Lainnya',
             'rfid_uid'    => 'required|string|max:255|unique:equipments,rfid_uid',
+            'status'      => 'nullable|in:available,borrowed,maintenance',
         ], [
             'name.required'     => 'Nama equipment wajib diisi.',
-            'category.required' => 'Kategori wajib diisi.',
+            'category.required' => 'Kategori wajib dipilih.',
+            'category.in'       => 'Kategori tidak valid.',
             'rfid_uid.required' => 'UID Tag RFID wajib diisi.',
             'rfid_uid.unique'   => 'UID RFID ini sudah terdaftar pada alat lain!',
         ]);
@@ -36,7 +38,7 @@ class EquipmentController extends Controller
             'name'     => $validated['name'],
             'category' => $validated['category'],
             'rfid_uid' => $validated['rfid_uid'],
-            'status'   => 'available', // Status awal default
+            'status'   => $validated['status'] ?? 'available',
         ]);
 
         return redirect()->route('equipment.index')->with('success', 'Equipment berhasil ditambahkan!');
@@ -51,12 +53,13 @@ class EquipmentController extends Controller
 
         $validated = $request->validate([
             'name'        => 'required|string|max:255',
-            'category'    => 'required|string|max:255',
+            'category'    => 'required|string|max:255|in:Hand Tools,Power Tools,Measuring Tools,Cutting Tools,Welding Equipment,Safety Equipment,Pneumatic Tools,Hydraulic Tools,Lainnya',
             'rfid_uid'    => 'required|string|max:255|unique:equipments,rfid_uid,' . $id,
-            'status'      => 'required|in:available,borrowed',
+            'status'      => 'required|in:available,borrowed,maintenance',
         ], [
             'name.required'     => 'Nama equipment wajib diisi.',
-            'category.required' => 'Kategori wajib diisi.',
+            'category.required' => 'Kategori wajib dipilih.',
+            'category.in'       => 'Kategori tidak valid.',
             'rfid_uid.required' => 'UID Tag RFID wajib diisi.',
             'rfid_uid.unique'   => 'UID RFID ini sudah terdaftar pada alat lain!',
             'status.required'   => 'Status wajib dipilih.',

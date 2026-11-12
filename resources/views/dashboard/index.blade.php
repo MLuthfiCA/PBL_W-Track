@@ -184,17 +184,20 @@
 
     /* ── TOPBAR ──────────────────────────────── */
     .topbar {
-        height: 60px;
+        height: 64px;
         background: #fff;
-        border-bottom: 1px solid var(--border);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        margin: 16px 28px 0 28px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 28px;
+        padding: 0 24px;
         position: sticky;
-        top: 0;
+        top: 16px;
         z-index: 50;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        transition: all var(--transition);
     }
 
     .topbar-left {
@@ -385,9 +388,9 @@
     }
 
     .stat-icon.total   { background: #EFF6FF; color: #3B82F6; }
-    .stat-icon.used    { background: #FFFBEB; color: var(--status-used); }
-    .stat-icon.repair  { background: #FEF2F2; color: var(--status-repair); }
-    .stat-icon.avail   { background: #F0FDF4; color: var(--status-available); }
+    .stat-icon.used    { background: #FEF2F2; color: #EF4444; } /* Merah - Dipinjam */
+    .stat-icon.repair  { background: #FFFBEB; color: #F59E0B; } /* Orange - Perbaikan */
+    .stat-icon.avail   { background: #F0FDF4; color: #10B981; } /* Hijau - Tersedia */
 
     .stat-value {
         font-size: 32px;
@@ -439,51 +442,43 @@
 
     .donut-container {
         position: relative;
-        width: 130px;
-        height: 130px;
+        width: 140px;
+        height: 140px;
         flex-shrink: 0;
     }
 
     .donut-svg {
-        width: 130px;
-        height: 130px;
+        width: 140px;
+        height: 140px;
         transform: rotate(-90deg);
+        overflow: visible;
     }
 
     .donut-track {
         fill: none;
-        stroke: #f0f4f8;
-        stroke-width: 18;
+        stroke: #f1f5f9;
+        stroke-width: 16;
     }
 
-    .donut-used {
+    .donut-circle {
         fill: none;
-        stroke: var(--primary);
-        stroke-width: 18;
-        stroke-linecap: round;
-        stroke-dasharray: 251.2;
-        stroke-dashoffset: 75.36; /* 70% used → 251.2 * 0.30 offset = 75.36 */
-        transition: stroke-dashoffset 1s ease;
+        stroke-width: 16;
+        stroke-dasharray: 0 251.2;
+        stroke-dashoffset: 0;
+        transition: stroke-dasharray 1.3s cubic-bezier(0.4, 0, 0.2, 1), stroke-dashoffset 1.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    /* Warna sesuai permintaan user: Hijau = Available, Orange = Diperbaiki, Merah = Dipinjam */
     .donut-avail {
-        fill: none;
-        stroke: #6EE7B7;
-        stroke-width: 18;
-        stroke-dasharray: 251.2;
-        stroke-dashoffset: 226.08; /* 10% avail → offset = 251.2 * 0.90 */
-        opacity: 0.8;
-        transition: stroke-dashoffset 1s ease;
+        stroke: #10B981; /* Hijau */
     }
 
     .donut-repair {
-        fill: none;
-        stroke: #FCA5A5;
-        stroke-width: 18;
-        stroke-dasharray: 251.2;
-        stroke-dashoffset: 243.66; /* 3% repair */
-        opacity: 0.8;
-        transition: stroke-dashoffset 1s ease;
+        stroke: #F59E0B; /* Orange */
+    }
+
+    .donut-borrowed {
+        stroke: #EF4444; /* Merah */
     }
 
     .donut-center {
@@ -493,25 +488,29 @@
         align-items: center;
         justify-content: center;
         flex-direction: column;
+        pointer-events: none;
     }
 
     .donut-pct {
-        font-size: 20px;
+        font-size: 22px;
         font-weight: 800;
         color: var(--text-primary);
         line-height: 1;
     }
 
     .donut-desc {
-        font-size: 10px;
+        font-size: 11px;
+        font-weight: 600;
         color: var(--text-muted);
-        margin-top: 2px;
+        margin-top: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .status-legend {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
         flex: 1;
     }
 
@@ -525,24 +524,27 @@
     .legend-dot-label {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
         color: var(--text-secondary);
+        font-weight: 500;
     }
 
     .legend-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 3px;
+        width: 12px;
+        height: 12px;
+        border-radius: 4px;
         flex-shrink: 0;
     }
 
-    .dot-used  { background: var(--primary); }
-    .dot-avail { background: #6EE7B7; }
-    .dot-repair{ background: #FCA5A5; }
+    /* Legenda 3 Warna */
+    .dot-avail  { background: #10B981; } /* Hijau */
+    .dot-repair { background: #F59E0B; } /* Orange */
+    .dot-borrow { background: #EF4444; } /* Merah */
 
     .legend-val {
         font-weight: 700;
         color: var(--text-primary);
+        font-size: 14px;
     }
 
     /* ── ACTIVITY CARD ───────────────────────── */
@@ -571,36 +573,54 @@
     .activity-list {
         display: flex;
         flex-direction: column;
-        gap: 14px;
+        gap: 12px;
     }
 
     .activity-item {
         display: flex;
         align-items: flex-start;
         gap: 12px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        transition: background var(--transition);
     }
 
-    .activity-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--primary);
-        margin-top: 4px;
+    .activity-item:hover {
+        background: #f8fafc;
+    }
+
+    .activity-icon-badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
         flex-shrink: 0;
-        box-shadow: 0 0 0 3px rgba(0,188,212,0.15);
+    }
+
+    .activity-title {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.3;
     }
 
     .activity-text {
-        font-size: 13.5px;
-        color: var(--text-primary);
-        font-weight: 500;
+        font-size: 12.5px;
+        color: var(--text-secondary);
+        margin-top: 2px;
         line-height: 1.4;
     }
 
     .activity-time {
-        font-size: 12px;
+        font-size: 11px;
         color: var(--text-muted);
-        margin-top: 2px;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
 
     /* ── EQUIPMENT TABLE ─────────────────────── */
@@ -730,7 +750,9 @@
         }
 
         .topbar {
+            margin: 12px 16px 0 16px;
             padding: 0 16px;
+            border-radius: 12px;
         }
 
         .user-details {
@@ -839,7 +861,7 @@
                     </div>
                     <div>
                         <div class="stat-value">{{ $stats['perbaikan'] }}</div>
-                        <div class="stat-sub warning">7 perlu perhatian</div>
+                        <div class="stat-sub warning">{{ $stats['perbaikan'] > 0 ? $stats['perbaikan'] . ' perlu perhatian' : 'Tidak ada perbaikan' }}</div>
                     </div>
                 </div>
 
@@ -859,31 +881,40 @@
             <!-- ── BOTTOM GRID ──────────────────── -->
             <div class="bottom-grid">
 
-                <!-- Status Equipment -->
+                <!-- Status Equipment (3 Warna: Hijau=Tersedia, Orange=Diperbaiki, Merah=Dipinjam) -->
                 <div class="section-card">
                     <div class="section-title">Status Equipment</div>
                     <div class="status-chart-wrapper">
                         <div class="donut-container">
                             <svg class="donut-svg" viewBox="0 0 100 100">
                                 <circle class="donut-track" cx="50" cy="50" r="40"/>
-                                <circle class="donut-used"   cx="50" cy="50" r="40"/>
-                                <circle class="donut-avail"  cx="50" cy="50" r="40"/>
-                                <circle class="donut-repair" cx="50" cy="50" r="40"/>
+                                <!-- 1. Hijau: Tersedia -->
+                                <circle id="donutAvail"
+                                        class="donut-circle donut-avail"
+                                        cx="50" cy="50" r="40"
+                                        data-length="{{ $chart['avail_len'] }}"
+                                        data-offset="{{ $chart['avail_offset'] }}"/>
+                                <!-- 2. Orange: Diperbaiki -->
+                                <circle id="donutRepair"
+                                        class="donut-circle donut-repair"
+                                        cx="50" cy="50" r="40"
+                                        data-length="{{ $chart['repair_len'] }}"
+                                        data-offset="{{ $chart['repair_offset'] }}"/>
+                                <!-- 3. Merah: Dipinjam -->
+                                <circle id="donutBorrowed"
+                                        class="donut-circle donut-borrowed"
+                                        cx="50" cy="50" r="40"
+                                        data-length="{{ $chart['borrowed_len'] }}"
+                                        data-offset="{{ $chart['borrowed_offset'] }}"/>
                             </svg>
                             <div class="donut-center">
-                                <div class="donut-pct">71%</div>
-                                <div class="donut-desc">digunakan</div>
+                                <div class="donut-pct">{{ $chart['avail_pct'] }}%</div>
+                                <div class="donut-desc">tersedia</div>
                             </div>
                         </div>
 
                         <div class="status-legend">
-                            <div class="legend-item">
-                                <div class="legend-dot-label">
-                                    <div class="legend-dot dot-used"></div>
-                                    Digunakan
-                                </div>
-                                <span class="legend-val">{{ $stats['digunakan'] }}</span>
-                            </div>
+                            <!-- Tersedia (Hijau) -->
                             <div class="legend-item">
                                 <div class="legend-dot-label">
                                     <div class="legend-dot dot-avail"></div>
@@ -891,35 +922,49 @@
                                 </div>
                                 <span class="legend-val">{{ $stats['tersedia'] }}</span>
                             </div>
+                            <!-- Diperbaiki (Orange) -->
                             <div class="legend-item">
                                 <div class="legend-dot-label">
                                     <div class="legend-dot dot-repair"></div>
-                                    Perbaikan
+                                    Diperbaiki
                                 </div>
                                 <span class="legend-val">{{ $stats['perbaikan'] }}</span>
+                            </div>
+                            <!-- Dipinjam (Merah) -->
+                            <div class="legend-item">
+                                <div class="legend-dot-label">
+                                    <div class="legend-dot dot-borrow"></div>
+                                    Dipinjam
+                                </div>
+                                <span class="legend-val">{{ $stats['digunakan'] }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Aktivitas Terbaru -->
+                <!-- Aktivitas Terbaru (3 Most Recent Aktivitas) -->
                 <div class="section-card">
                     <div class="activity-header">
                         <div class="section-title">Aktivitas Terbaru</div>
-                        <a href="{{ route('laporan.index') }}" class="link-all">Lihat semua</a>
+                        <a href="{{ route('equipment.index') }}" class="link-all">Lihat equipment</a>
                     </div>
 
                     <div class="activity-list">
                         @forelse($aktivitas as $item)
                         <div class="activity-item">
-                            <div class="activity-dot"></div>
-                            <div>
+                            <div class="activity-icon-badge" style="background: {{ $item['color'] }}15; color: {{ $item['color'] }};">
+                                <i class="{{ $item['icon'] }}"></i>
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div class="activity-title">{{ $item['title'] }}</div>
                                 <div class="activity-text">{{ $item['text'] }}</div>
-                                <div class="activity-time">{{ $item['time'] }}</div>
+                                <div class="activity-time">
+                                    <i class="ri-time-line"></i> {{ $item['time'] }}
+                                </div>
                             </div>
                         </div>
                         @empty
-                        <p style="color:var(--text-muted); font-size:13px;">Belum ada aktivitas terbaru.</p>
+                        <p style="color:var(--text-muted); font-size:13px; text-align: center; padding: 20px;">Belum ada aktivitas terbaru.</p>
                         @endforelse
                     </div>
                 </div>
@@ -989,12 +1034,30 @@
     sidebarClose?.addEventListener('click', closeSidebar);
     overlay?.addEventListener('click', closeSidebar);
 
-    // Donut chart animation on load
-    window.addEventListener('load', () => {
-        const circles = document.querySelectorAll('.donut-used, .donut-avail, .donut-repair');
-        circles.forEach(c => {
-            const offset = parseFloat(c.style.strokeDashoffset || c.getAttribute('stroke-dashoffset') || getComputedStyle(c).strokeDashoffset);
-        });
-    });
+    // Donut chart animation on load - membuat graph circle bergerak mulus dengan 3 warna
+    function animateDonutChart() {
+        const availCircle    = document.getElementById('donutAvail');
+        const repairCircle   = document.getElementById('donutRepair');
+        const borrowedCircle = document.getElementById('donutBorrowed');
+
+        if (availCircle) {
+            availCircle.style.strokeDasharray  = `${availCircle.dataset.length} 251.2`;
+            availCircle.style.strokeDashoffset = availCircle.dataset.offset;
+        }
+        if (repairCircle) {
+            repairCircle.style.strokeDasharray  = `${repairCircle.dataset.length} 251.2`;
+            repairCircle.style.strokeDashoffset = repairCircle.dataset.offset;
+        }
+        if (borrowedCircle) {
+            borrowedCircle.style.strokeDasharray  = `${borrowedCircle.dataset.length} 251.2`;
+            borrowedCircle.style.strokeDashoffset = borrowedCircle.dataset.offset;
+        }
+    }
+
+    if (document.readyState === 'complete') {
+        setTimeout(animateDonutChart, 100);
+    } else {
+        window.addEventListener('load', () => setTimeout(animateDonutChart, 100));
+    }
 </script>
 @endsection

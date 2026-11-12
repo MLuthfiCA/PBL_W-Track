@@ -27,17 +27,20 @@
 
     /* ── TOPBAR ──────────────────────────────── */
     .topbar {
-        height: 60px;
+        height: 64px;
         background: #fff;
-        border-bottom: 1px solid var(--border);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        margin: 16px 28px 0 28px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 28px;
+        padding: 0 24px;
         position: sticky;
-        top: 0;
+        top: 16px;
         z-index: 50;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        transition: all var(--transition);
     }
 
     .topbar-left {
@@ -370,6 +373,11 @@
         color: #059669;
     }
 
+    .badge-maintenance {
+        background: #FEF2F2;
+        color: #DC2626;
+    }
+
     /* ── ACTION BUTTONS ────────────────────── */
     .action-btns {
         display: flex;
@@ -675,7 +683,9 @@
         }
 
         .topbar {
+            margin: 12px 16px 0 16px;
             padding: 0 16px;
+            border-radius: 12px;
         }
 
         .user-details {
@@ -856,6 +866,12 @@
                                             Dipinjam
                                         </span>
 
+                                    @elseif($eq->status === 'maintenance')
+
+                                        <span class="badge badge-maintenance">
+                                            Diperbaiki
+                                        </span>
+
                                     @else
 
                                         <span class="badge badge-workshop">
@@ -943,11 +959,19 @@
 
                 <div class="form-group">
                     <label>Kategori <span class="required">*</span></label>
-                    <input type="text"
-                           name="category"
-                           class="form-input @error('category') is-invalid @enderror"
-                           placeholder="Masukkan kategori equipment"
-                           value="{{ old('category') }}">
+                    <select name="category"
+                            class="form-select @error('category') is-invalid @enderror">
+                        <option value="" disabled {{ old('category') ? '' : 'selected' }}>Pilih kategori</option>
+                        <option value="Hand Tools" {{ old('category') == 'Hand Tools' ? 'selected' : '' }}>Hand Tools</option>
+                        <option value="Power Tools" {{ old('category') == 'Power Tools' ? 'selected' : '' }}>Power Tools</option>
+                        <option value="Measuring Tools" {{ old('category') == 'Measuring Tools' ? 'selected' : '' }}>Measuring Tools</option>
+                        <option value="Cutting Tools" {{ old('category') == 'Cutting Tools' ? 'selected' : '' }}>Cutting Tools</option>
+                        <option value="Welding Equipment" {{ old('category') == 'Welding Equipment' ? 'selected' : '' }}>Welding Equipment</option>
+                        <option value="Safety Equipment" {{ old('category') == 'Safety Equipment' ? 'selected' : '' }}>Safety Equipment</option>
+                        <option value="Pneumatic Tools" {{ old('category') == 'Pneumatic Tools' ? 'selected' : '' }}>Pneumatic Tools</option>
+                        <option value="Hydraulic Tools" {{ old('category') == 'Hydraulic Tools' ? 'selected' : '' }}>Hydraulic Tools</option>
+                        <option value="Lainnya" {{ old('category') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                    </select>
                     @error('category')
                         <div class="form-error">{{ $message }}</div>
                     @enderror
@@ -963,6 +987,15 @@
                     @error('rfid_uid')
                         <div class="form-error">{{ $message }}</div>
                     @enderror
+                </div>
+
+                <div class="form-group">
+                    <label>Status <span class="required">*</span></label>
+                    <select name="status" class="form-select">
+                        <option value="available" {{ old('status', 'available') == 'available' ? 'selected' : '' }}>Tersedia</option>
+                        <option value="borrowed" {{ old('status') == 'borrowed' ? 'selected' : '' }}>Dipinjam</option>
+                        <option value="maintenance" {{ old('status') == 'maintenance' ? 'selected' : '' }}>Diperbaiki</option>
+                    </select>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1001,11 +1034,18 @@
 
                 <div class="form-group">
                     <label>Kategori <span class="required">*</span></label>
-                    <input type="text"
-                           name="category"
-                           id="editCategory"
-                           class="form-input"
-                           placeholder="Masukkan kategori equipment">
+                    <select name="category" id="editCategory" class="form-select">
+                        <option value="" disabled>Pilih kategori</option>
+                        <option value="Hand Tools">Hand Tools</option>
+                        <option value="Power Tools">Power Tools</option>
+                        <option value="Measuring Tools">Measuring Tools</option>
+                        <option value="Cutting Tools">Cutting Tools</option>
+                        <option value="Welding Equipment">Welding Equipment</option>
+                        <option value="Safety Equipment">Safety Equipment</option>
+                        <option value="Pneumatic Tools">Pneumatic Tools</option>
+                        <option value="Hydraulic Tools">Hydraulic Tools</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -1022,6 +1062,7 @@
                     <select name="status" id="editStatus" class="form-select">
                         <option value="available">Tersedia</option>
                         <option value="borrowed">Dipinjam</option>
+                        <option value="maintenance">Diperbaiki</option>
                     </select>
                 </div>
             </div>

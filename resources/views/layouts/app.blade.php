@@ -79,6 +79,7 @@
             z-index: 100;
             transition: transform var(--transition);
             overflow: hidden;
+            border-radius: 0 16px 16px 0;
         }
 
         .sidebar::before {
@@ -225,7 +226,40 @@
             display: block;
         }
 
+        /* ── GLOBAL TOPBAR (smooth edges) ─────────────── */
+        .main-content {
+            margin-left: 220px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            min-width: 0;
+        }
+
+        .topbar {
+            height: 64px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin: 16px 28px 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 16px;
+            z-index: 50;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            transition: all var(--transition);
+        }
+
         @media (max-width: 768px) {
+            .topbar {
+                margin: 12px 16px 0 16px;
+                padding: 0 16px;
+                border-radius: 12px;
+            }
+
             .sidebar {
                 transform: translateX(-100%);
             }
@@ -236,6 +270,10 @@
 
             .sidebar-close {
                 display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
             }
         }
     </style>

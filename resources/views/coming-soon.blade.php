@@ -126,17 +126,20 @@
     }
 
     .topbar {
-        height: 60px;
+        height: 64px;
         background: #fff;
-        border-bottom: 1px solid var(--border);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        margin: 16px 28px 0 28px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 28px;
+        padding: 0 24px;
         position: sticky;
-        top: 0;
+        top: 16px;
         z-index: 50;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        transition: all var(--transition);
     }
 
     .topbar-left { display: flex; align-items: center; gap: 14px; }
