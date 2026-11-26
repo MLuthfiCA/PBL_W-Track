@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\EquipmentController;
+use App\Http\Controllers\MonitoringIotController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +48,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/equipment/{equipment}', [EquipmentController::class, 'update'])->name('equipment.update');
     Route::delete('/equipment/{equipment}', [EquipmentController::class, 'destroy'])->name('equipment.destroy');
 
-    Route::get('/monitoring-iot', fn() => view('coming-soon', ['page' => 'Monitoring IoT']))->name('monitoring-iot.index');
+    Route::get('/monitoring-iot', [MonitoringIotController::class, 'index'])->name('monitoring-iot.index');
+    Route::get('/notifikasi', [MonitoringIotController::class, 'notifications'])->name('notifikasi.index');
 
     Route::get('/transaksi', [TransactionController::class, 'index'])->name('transaksi.index');
     Route::post('/transaksi', [TransactionController::class, 'store'])->name('transaksi.store');
@@ -58,5 +60,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/pemeliharaan', fn() => view('coming-soon', ['page' => 'Pemeliharaan']))->name('pemeliharaan.index');
     Route::get('/laporan',     fn() => view('coming-soon', ['page' => 'Laporan']))->name('laporan.index');
     Route::get('/pengaturan',  fn() => view('coming-soon', ['page' => 'Pengaturan']))->name('pengaturan.index');
-    Route::get('/notifikasi',  fn() => view('coming-soon', ['page' => 'Notifikasi']))->name('notifikasi.index');
 });
