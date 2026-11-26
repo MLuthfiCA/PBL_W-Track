@@ -43,10 +43,17 @@ Route::middleware('auth')->group(function () {
 
     // Menu Utama Design Handoff
     Route::get('/equipment', [EquipmentController::class, 'index'])->name('equipment.index');
-    Route::get('/monitoring-iot', fn() => view('coming-soon', ['page' => 'Monitoring IoT']))->name('monitoring-iot.index');
-    Route::get('/transaksi', fn() => view('coming-soon', ['page' => 'Transaksi']))->name('transaksi.index');
-    Route::get('/riwayat', fn() => view('coming-soon', ['page' => 'Riwayat']))->name('riwayat.index');
+    Route::post('/equipment', [EquipmentController::class, 'store'])->name('equipment.store');
+    Route::put('/equipment/{equipment}', [EquipmentController::class, 'update'])->name('equipment.update');
+    Route::delete('/equipment/{equipment}', [EquipmentController::class, 'destroy'])->name('equipment.destroy');
 
+    Route::get('/monitoring-iot', fn() => view('coming-soon', ['page' => 'Monitoring IoT']))->name('monitoring-iot.index');
+
+    Route::get('/transaksi', [TransactionController::class, 'index'])->name('transaksi.index');
+    Route::post('/transaksi', [TransactionController::class, 'store'])->name('transaksi.store');
+
+    Route::get('/riwayat', fn() => view('coming-soon', ['page' => 'Riwayat']))->name('riwayat.index');
+    
     // Rute lama (dipertahankan sementara agar tidak error jika masih dipanggil)
     Route::get('/pemeliharaan', fn() => view('coming-soon', ['page' => 'Pemeliharaan']))->name('pemeliharaan.index');
     Route::get('/laporan',     fn() => view('coming-soon', ['page' => 'Laporan']))->name('laporan.index');

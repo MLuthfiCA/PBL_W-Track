@@ -9,6 +9,65 @@ use Illuminate\Http\Request;
 class TransactionController extends Controller
 {
     /**
+     * Tampilkan halaman pencatatan & simulasi transaksi keluar-masuk (WTR-04)
+     */
+    public function index()
+    {
+        $equipments = Equipment::orderBy('name', 'asc')->get();
+
+        $recentTransactions = Transaction::with('equipment')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('transaksi.index', compact('equipments', 'recentTransactions'));
+    }
+
+    /**
+     * Proses pencatatan transaksi melalui form web Staff Admin
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'equipment_id' => 'required|exists:equipments,id',
+            'type'         => 'required|in:in,out',
+        ], [
+            'equipment_id.required' => 'Equipment wajib dipilih.',
+            'equipment_id.exists'   => 'Equipment tidak ditemukan di dalam sistem.',
+            'type.required'         => 'Jenis transaksi wajib dipilih.',
+        ]);
+
+        $equipment = Equipment::findOrFail($validated['equipment_id']);
+
+        if ($validated['type'] === 'out' && $equipment->status === 'borrowed') {
+            return back()
+                ->withInput()
+                ->with('error', "Transaksi ditolak: {$equipment->name} sudah berstatus Di Luar Workshop.");
+        }
+
+        if ($validated['type'] === 'in' && $equipment->status === 'available') {
+            return back()
+                ->withInput()
+                ->with('error', "Transaksi ditolak: {$equipment->name} sudah berada Di Workshop.");
+        }
+
+        Transaction::create([
+            'equipment_id' => $equipment->id,
+            'type'         => $validated['type'],
+        ]);
+
+        $equipment->update([
+            'status' => $validated['type'] === 'out' ? 'borrowed' : 'available',
+        ]);
+
+        $label = $validated['type'] === 'out' ? 'keluar dari' : 'masuk ke';
+
+        return redirect()
+            ->route('transaksi.index')
+            ->with('success', "Transaksi berhasil disimpan: {$equipment->name} tercatat {$label} workshop.");
+    }
+
+    /**
      * Memproses pencatatan transaksi equipment keluar (WTR-03)
      */
     public function scanOut(Request $request)
