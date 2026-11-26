@@ -68,6 +68,38 @@ class TransactionController extends Controller
     }
 
     /**
+     * Tampilkan halaman riwayat pergerakan equipment dengan pencarian & filter (WTR-06 & WTR-07)
+     */
+    public function history(Request $request)
+    {
+        $query = Transaction::with('equipment')->latest();
+
+        // Pencarian berdasarkan nama equipment, kategori, atau UID RFID
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->whereHas('equipment', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('rfid_uid', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter jenis transaksi ('in' atau 'out')
+        if ($request->filled('type') && in_array($request->type, ['in', 'out'])) {
+            $query->where('type', $request->type);
+        }
+
+        // Filter tanggal spesifik
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        $transactions = $query->paginate(10)->withQueryString();
+
+        return view('riwayat.index', compact('transactions'));
+    }
+
+    /**
      * Memproses pencatatan transaksi equipment keluar (WTR-03)
      */
     public function scanOut(Request $request)

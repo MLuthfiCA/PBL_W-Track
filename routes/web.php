@@ -52,8 +52,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/transaksi', [TransactionController::class, 'index'])->name('transaksi.index');
     Route::post('/transaksi', [TransactionController::class, 'store'])->name('transaksi.store');
 
-    Route::get('/riwayat', fn() => view('coming-soon', ['page' => 'Riwayat']))->name('riwayat.index');
-    
+    Route::get('/riwayat', [TransactionController::class, 'history'])->name('riwayat.index');
+
     // Rute lama (dipertahankan sementara agar tidak error jika masih dipanggil)
     Route::get('/pemeliharaan', fn() => view('coming-soon', ['page' => 'Pemeliharaan']))->name('pemeliharaan.index');
     Route::get('/laporan',     fn() => view('coming-soon', ['page' => 'Laporan']))->name('laporan.index');
