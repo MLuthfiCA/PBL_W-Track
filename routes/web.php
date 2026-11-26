@@ -12,7 +12,7 @@ use App\Http\Controllers\EquipmentController;
 |--------------------------------------------------------------------------
 */
 
-// Redirect root → login
+// Redirect root -> login
 Route::get('/', function () {
     return redirect()->route('login');
 });
@@ -29,7 +29,6 @@ Route::get('/password/reset', function () {
 })->name('password.request');
 
 // ── TRANSAKSI & RFID API (WTR-03 & WTR-04) ──────────────
-// Endpoint ini dibuka agar dapat dipanggil oleh simulasi/sensor RFID tanpa terhalang auth session
 Route::post('/scan-out', [TransactionController::class, 'scanOut'])->name('scan.out');
 Route::post('/scan-in', [TransactionController::class, 'scanIn'])->name('scan.in');
 
@@ -42,9 +41,13 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Placeholder routes (akan diisi di sprint berikutnya)
-    Route::get('/equipment', [EquipmentController::class, 'index'])
-        ->name('equipment.index');    
+    // Menu Utama Design Handoff
+    Route::get('/equipment', [EquipmentController::class, 'index'])->name('equipment.index');
+    Route::get('/monitoring-iot', fn() => view('coming-soon', ['page' => 'Monitoring IoT']))->name('monitoring-iot.index');
+    Route::get('/transaksi', fn() => view('coming-soon', ['page' => 'Transaksi']))->name('transaksi.index');
+    Route::get('/riwayat', fn() => view('coming-soon', ['page' => 'Riwayat']))->name('riwayat.index');
+
+    // Rute lama (dipertahankan sementara agar tidak error jika masih dipanggil)
     Route::get('/pemeliharaan', fn() => view('coming-soon', ['page' => 'Pemeliharaan']))->name('pemeliharaan.index');
     Route::get('/laporan',     fn() => view('coming-soon', ['page' => 'Laporan']))->name('laporan.index');
     Route::get('/pengaturan',  fn() => view('coming-soon', ['page' => 'Pengaturan']))->name('pengaturan.index');

@@ -1,1177 +1,471 @@
-```php
 @extends('layouts.app')
 
 @section('title', 'Dashboard')
+@section('page-title', 'Dashboard')
+@section('page-subtitle', 'Monitoring keluar-masuk equipment workshop')
 
 @section('styles')
 <style>
-    /* ── LAYOUT ──────────────────────────────── */
-    body {
-        background: #f0f4f8;
-        display: flex;
-    }
-
-    .app-wrapper {
-        display: flex;
-        width: 100%;
-        min-height: 100vh;
-    }
-
-    /* ── SIDEBAR ─────────────────────────────── */
-    .sidebar {
-        width: 220px;
-        min-height: 100vh;
-        background: var(--sidebar-bg);
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 100;
-        transition: transform var(--transition);
-        overflow: hidden;
-    }
-
-    .sidebar::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-    }
-
-    .sidebar-logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 22px 20px 20px;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-        flex-shrink: 0;
-    }
-
-    .logo-icon-sm {
-        width: 32px;
-        height: 32px;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        color: #fff;
-        flex-shrink: 0;
-        box-shadow: 0 2px 8px var(--primary-glow);
-    }
-
-    .sidebar-logo .logo-text {
-        font-size: 16px;
-        font-weight: 700;
-        color: #fff;
-        flex: 1;
-    }
-
-    .sidebar-close {
-        display: none;
-        background: none;
-        border: none;
-        color: rgba(255,255,255,0.5);
-        font-size: 20px;
-        cursor: pointer;
-        padding: 4px;
-    }
-
-    /* Nav */
-    .sidebar-nav {
-        flex: 1;
-        padding: 14px 12px;
-        overflow-y: auto;
-    }
-
-    .sidebar-nav::-webkit-scrollbar { width: 4px; }
-    .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
-    .sidebar-nav::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.1);
-        border-radius: 4px;
-    }
-
-    .nav-list {
-        list-style: none;
-        margin-bottom: 6px;
-    }
-
-    .nav-section-label {
-        font-size: 10px;
-        font-weight: 600;
-        color: rgba(255,255,255,0.25);
-        letter-spacing: 1.2px;
-        padding: 14px 8px 6px;
-    }
-
-    .nav-item {
-        margin-bottom: 2px;
-    }
-
-    .nav-link {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 12px;
-        border-radius: var(--radius-sm);
-        color: rgba(255,255,255,0.55);
-        text-decoration: none;
-        font-size: 13.5px;
-        font-weight: 500;
-        transition: all var(--transition);
-        background: none;
-        border: none;
-        width: 100%;
-        cursor: pointer;
-        font-family: 'Inter', sans-serif;
-    }
-
-    .nav-link:hover {
-        background: rgba(255,255,255,0.07);
-        color: rgba(255,255,255,0.9);
-    }
-
-    .nav-item.active .nav-link {
-        background: linear-gradient(90deg, rgba(0,188,212,0.18), rgba(0,188,212,0.05));
-        color: var(--primary);
-        font-weight: 600;
-        position: relative;
-    }
-
-    .nav-item.active .nav-link::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 20%;
-        bottom: 20%;
-        width: 3px;
-        background: var(--primary);
-        border-radius: 0 3px 3px 0;
-        margin-left: -12px;
-    }
-
-    .nav-icon {
-        font-size: 18px;
-        flex-shrink: 0;
-    }
-
-    .nav-logout {
-        color: rgba(255,100,100,0.65);
-    }
-
-    .nav-logout:hover {
-        background: rgba(239,68,68,0.1);
-        color: #FC8181;
-    }
-
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 99;
-        backdrop-filter: blur(2px);
-    }
-
-    /* ── MAIN CONTENT ────────────────────────── */
-    .main-content {
-        margin-left: 220px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        min-width: 0;
-    }
-
-    /* ── TOPBAR ──────────────────────────────── */
-    .topbar {
-        height: 60px;
-        background: #fff;
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 28px;
-        position: sticky;
-        top: 0;
-        z-index: 50;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    }
-
-    .topbar-left {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-    }
-
-    .hamburger-btn {
-        display: none;
-        background: none;
-        border: none;
-        font-size: 22px;
-        color: var(--text-secondary);
-        cursor: pointer;
-        padding: 4px;
-    }
-
-    .topbar-title h2 {
-        font-size: 19px;
-        font-weight: 700;
-        color: var(--text-primary);
-        line-height: 1.1;
-    }
-
-    .topbar-title p {
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-top: 1px;
-    }
-
-    .topbar-right {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .notif-btn {
-        position: relative;
-        width: 38px;
-        height: 38px;
-        background: #f8fafc;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 19px;
-        color: var(--text-secondary);
-        transition: all var(--transition);
-        text-decoration: none;
-    }
-
-    .notif-btn:hover {
-        background: var(--primary);
-        border-color: var(--primary);
-        color: #fff;
-        box-shadow: 0 4px 12px var(--primary-glow);
-    }
-
-    .notif-badge {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        width: 8px;
-        height: 8px;
-        background: #EF4444;
-        border-radius: 50%;
-        border: 1.5px solid #fff;
-    }
-
-    .user-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 6px 12px;
-        background: #f8fafc;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all var(--transition);
-    }
-
-    .user-info:hover {
-        border-color: var(--primary);
-        background: #fff;
-    }
-
-    .user-avatar {
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 13px;
-        font-weight: 700;
-        color: #fff;
-        flex-shrink: 0;
-    }
-
-    .user-details {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .user-name {
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--text-primary);
-        line-height: 1;
-    }
-
-    .user-role {
-        font-size: 11px;
-        color: var(--text-muted);
-        margin-top: 2px;
-    }
-
-    /* ── PAGE CONTENT ────────────────────────── */
-    .page-content {
-        padding: 24px 28px;
-        flex: 1;
-    }
-
-    /* ── STAT CARDS ──────────────────────────── */
-    .stats-grid {
+    /* ── STATISTIC CARDS (3 KOLOM DESKTOP) ─────────────── */
+    .dash-stats-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        margin-bottom: 20px;
+        gap: 20px;
+        margin-bottom: 24px;
     }
 
     .stat-card {
-        background: #fff;
-        border-radius: var(--radius);
-        padding: 20px 22px;
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-card);
+        padding: 20px;
+        box-shadow: var(--shadow-card);
         display: flex;
-        flex-direction: column;
-        gap: 12px;
-        transition: all var(--transition);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .stat-card::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        transition: opacity var(--transition);
-        background: linear-gradient(135deg, rgba(0,188,212,0.03), transparent);
+        justify-content: space-between;
+        align-items: flex-start;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     }
 
     .stat-card:hover {
         transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-        border-color: rgba(0,188,212,0.3);
+        box-shadow: 0 6px 16px rgba(32, 37, 53, 0.08);
+        border-color: #CBD5E1;
     }
 
-    .stat-card:hover::after {
-        opacity: 1;
-    }
-
-    .stat-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .stat-label {
-        font-size: 12px;
-        color: var(--text-muted);
+    .stat-title {
+        font-size: 14px;
         font-weight: 500;
-        letter-spacing: 0.2px;
+        color: var(--text-main);
+        margin-bottom: 8px;
     }
 
-    .stat-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 9px;
+    .stat-number {
+        font-size: 30px;
+        font-weight: 700;
+        line-height: 1.15;
+        margin-bottom: 6px;
+    }
+
+    .stat-number.primary { color: var(--text-main); }
+    .stat-number.success { color: var(--success); }
+    .stat-number.warning { color: var(--warning); }
+
+    .stat-caption {
+        font-size: 12px;
+        color: var(--text-neutral);
+    }
+
+    .stat-icon-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 17px;
+        flex-shrink: 0;
     }
 
-    .stat-icon.total {
-        background: #EFF6FF;
-        color: #3B82F6;
-    }
+    .stat-icon-box.primary { background: var(--primary-light); color: var(--primary); }
+    .stat-icon-box.success { background: var(--success-bg); color: var(--success); }
+    .stat-icon-box.warning { background: var(--warning-bg); color: var(--warning); }
 
-    .stat-icon.out {
-        background: #FEF2F2;
-        color: #DC2626;
-    }
-
-    .stat-icon.workshop {
-        background: #F0FDF4;
-        color: #059669;
-    }
-
-    .stat-value {
-        font-size: 32px;
-        font-weight: 800;
-        color: var(--text-primary);
-        line-height: 1;
-        letter-spacing: -1px;
-    }
-
-    .stat-sub {
-        font-size: 11.5px;
-        color: var(--text-muted);
-        margin-top: 2px;
-    }
-
-    .stat-sub.warning {
-        color: #DC2626;
-    }
-
-    .stat-sub.success {
-        color: #059669;
-    }
-
-    /* ── BOTTOM GRID ─────────────────────────── */
-    .bottom-grid {
+    /* ── MAIN DASHBOARD GRID (KIRI TABEL, KANAN IOT & NOTIF) */
+    .dash-main-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-        margin-bottom: 20px;
+        grid-template-columns: 1.65fr 1fr;
+        gap: 20px;
+        align-items: start;
     }
 
-    /* ── STATUS CARD ─────────────────────────── */
-    .section-card {
-        background: #fff;
-        border-radius: var(--radius);
-        padding: 22px;
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
-    }
-
-    .section-title {
-        font-size: 15px;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 20px;
-    }
-
-    /* Donut chart */
-    .status-chart-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 28px;
-    }
-
-    .donut-container {
-        position: relative;
-        width: 130px;
-        height: 130px;
-        flex-shrink: 0;
-    }
-
-    .donut-svg {
-        width: 130px;
-        height: 130px;
-        transform: rotate(-90deg);
-    }
-
-    .donut-track {
-        fill: none;
-        stroke: #f0f4f8;
-        stroke-width: 18;
-    }
-
-    .donut-out {
-        fill: none;
-        stroke: #EF4444;
-        stroke-width: 18;
-        stroke-linecap: round;
-        stroke-dasharray: 251.2;
-        stroke-dashoffset: 75.36;
-        transition: stroke-dashoffset 1s ease;
-    }
-
-    .donut-workshop {
-        fill: none;
-        stroke: #6EE7B7;
-        stroke-width: 18;
-        stroke-linecap: round;
-        stroke-dasharray: 251.2;
-        stroke-dashoffset: 226.08;
-        opacity: 0.8;
-        transition: stroke-dashoffset 1s ease;
-    }
-
-    .donut-center {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-    }
-
-    .donut-pct {
-        font-size: 20px;
-        font-weight: 800;
-        color: var(--text-primary);
-        line-height: 1;
-    }
-
-    .donut-desc {
-        font-size: 10px;
-        color: var(--text-muted);
-        margin-top: 2px;
-    }
-
-    .status-legend {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        flex: 1;
-    }
-
-    .legend-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 13px;
-    }
-
-    .legend-dot-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--text-secondary);
-    }
-
-    .legend-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 3px;
-        flex-shrink: 0;
-    }
-
-    .dot-out {
-        background: #EF4444;
-    }
-
-    .dot-workshop {
-        background: #6EE7B7;
-    }
-
-    .legend-val {
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-
-    /* ── ACTIVITY CARD ───────────────────────── */
-    .activity-header {
+    .card-header-flex {
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 16px;
-    }
-
-    .activity-header .section-title {
-        margin-bottom: 0;
-    }
-
-    .link-all {
-        font-size: 12.5px;
-        font-weight: 500;
-        color: var(--primary-dark);
-        text-decoration: none;
-        transition: color var(--transition);
-    }
-
-    .link-all:hover {
-        color: var(--primary);
-        text-decoration: underline;
-    }
-
-    .activity-list {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-    }
-
-    .activity-item {
-        display: flex;
-        align-items: flex-start;
         gap: 12px;
     }
 
-    .activity-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--primary);
-        margin-top: 4px;
-        flex-shrink: 0;
-        box-shadow: 0 0 0 3px rgba(0,188,212,0.15);
+    .card-heading {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-main);
     }
 
-    .activity-text {
-        font-size: 13.5px;
-        color: var(--text-primary);
+    .card-action-link {
+        font-size: 13px;
         font-weight: 500;
-        line-height: 1.4;
+        color: var(--primary);
+        text-decoration: none;
     }
 
-    .activity-time {
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-top: 2px;
+    .card-action-link:hover {
+        text-decoration: underline;
     }
 
-    /* ── EQUIPMENT TABLE ─────────────────────── */
-    .table-card {
-        background: #fff;
-        border-radius: var(--radius);
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
+    /* ── ACTIVITY TABLE (ROW 54px) ─────────────────────── */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
     }
 
-    .table-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 18px 22px;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .table-header .section-title {
-        margin-bottom: 0;
-    }
-
-    .data-table {
+    .wt-table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 520px;
     }
 
-    .data-table thead tr {
-        background: #fafbfc;
-    }
-
-    .data-table th {
-        padding: 11px 22px;
+    .wt-table th {
         text-align: left;
-        font-size: 11.5px;
+        font-size: 12px;
         font-weight: 600;
-        color: var(--text-muted);
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        border-bottom: 1px solid var(--border);
+        color: var(--text-secondary);
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border-subtle);
+        background: #FAFBFD;
+        white-space: nowrap;
     }
 
-    .data-table td {
-        padding: 13px 22px;
-        font-size: 13.5px;
-        color: var(--text-primary);
-        border-bottom: 1px solid #f5f7fa;
+    .wt-table td {
+        height: 54px;
+        padding: 10px 14px;
+        font-size: 14px;
+        color: var(--text-main);
+        border-bottom: 1px solid var(--border-color);
         vertical-align: middle;
     }
 
-    .data-table tbody tr:last-child td {
+    .wt-table tbody tr:last-child td {
         border-bottom: none;
     }
 
-    .data-table tbody tr {
-        transition: background var(--transition);
+    .wt-table tbody tr:hover {
+        background: #F8FAFC;
     }
 
-    .data-table tbody tr:hover {
-        background: #fafcff;
+    /* ── RIGHT COLUMN PANELS ───────────────────────────── */
+    .dash-right-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
     }
 
-    .equipment-name {
+    .iot-device-item {
+        border: 1px solid var(--border-subtle);
+        border-radius: 10px;
+        padding: 14px;
+        background: #FFFFFF;
+    }
+
+    .iot-device-item + .iot-device-item {
+        margin-top: 12px;
+    }
+
+    .iot-device-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .iot-device-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .iot-icon-circle {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .iot-icon-circle.offline { background: var(--danger-bg); color: var(--danger); }
+    .iot-icon-circle.online  { background: var(--success-bg); color: var(--success); }
+
+    .iot-device-name {
+        font-size: 14px;
         font-weight: 600;
-        color: var(--text-primary);
+        color: var(--text-main);
     }
 
-    .equipment-code {
-        font-family: 'Courier New', monospace;
-        font-size: 12.5px;
+    .iot-device-loc {
+        font-size: 12px;
         color: var(--text-secondary);
     }
 
-    /* Status badges */
-    .badge {
+    .iot-last-seen {
+        font-size: 12px;
+        color: var(--text-neutral);
+        margin-top: 8px;
+    }
+
+    .iot-alert-box {
+        margin-top: 10px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        background: var(--danger-bg);
+        color: #B3261E;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    /* ── NOTIFICATION LIST ─────────────────────────────── */
+    .notif-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .notif-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .notif-item:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .notif-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .notif-icon.success { background: var(--success-bg); color: var(--success); }
+    .notif-icon.warning { background: var(--warning-bg); color: var(--warning); }
+    .notif-icon.danger  { background: var(--danger-bg);  color: var(--danger); }
+
+    .notif-msg {
+        font-size: 13px;
+        color: var(--text-main);
+        line-height: 1.4;
+    }
+
+    .notif-time {
+        font-size: 12px;
+        color: var(--text-neutral);
+        margin-top: 2px;
+    }
+
+    /* ── EMPTY STATE ───────────────────────────────────── */
+    .empty-state-box {
+        text-align: center;
+        padding: 36px 16px;
+    }
+
+    .empty-state-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--primary-light);
+        color: var(--primary);
         display: inline-flex;
         align-items: center;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11.5px;
-        font-weight: 600;
-        letter-spacing: 0.2px;
+        justify-content: center;
+        margin-bottom: 12px;
     }
 
-    .badge-out {
-        background: #FEF2F2;
-        color: #DC2626;
-    }
-
-    .badge-workshop {
-        background: #F0FDF4;
-        color: #059669;
-    }
-
-    /* ── RESPONSIVE ──────────────────────────── */
-    @media (max-width: 1200px) {
-        .stats-grid {
+    /* ── RESPONSIVE BREAKPOINTS (Design Handoff Sec 10) */
+    @media (max-width: 1024px) {
+        .dash-stats-grid {
             grid-template-columns: repeat(2, 1fr);
         }
-    }
-
-    @media (max-width: 900px) {
-        .bottom-grid {
+        .dash-main-grid {
             grid-template-columns: 1fr;
         }
     }
 
-    @media (max-width: 768px) {
-        .sidebar {
-            transform: translateX(-100%);
-        }
-
-        .sidebar.open {
-            transform: translateX(0);
-        }
-
-        .sidebar-overlay.open {
-            display: block;
-        }
-
-        .sidebar-close {
-            display: block;
-        }
-
-        .main-content {
-            margin-left: 0;
-        }
-
-        .hamburger-btn {
-            display: block;
-        }
-
-        .page-content {
-            padding: 16px;
-        }
-
-        .stats-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .topbar {
-            padding: 0 16px;
-        }
-
-        .user-details {
-            display: none;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .stats-grid {
+    @media (max-width: 600px) {
+        .dash-stats-grid {
             grid-template-columns: 1fr;
         }
-
-        .status-chart-wrapper {
-            flex-direction: column;
-        }
-    }
-
-    /* ── ANIMATIONS ──────────────────────────── */
-    @keyframes fadeUp {
-        from {
-            opacity: 0;
-            transform: translateY(14px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .stat-card {
-        animation: fadeUp 0.5s ease both;
-    }
-
-    .stat-card:nth-child(1) { animation-delay: 0.05s; }
-    .stat-card:nth-child(2) { animation-delay: 0.10s; }
-    .stat-card:nth-child(3) { animation-delay: 0.15s; }
-
-    .section-card,
-    .table-card {
-        animation: fadeUp 0.5s ease 0.25s both;
     }
 </style>
 @endsection
 
 @section('content')
-<div class="app-wrapper">
+    <!-- 1. STATISTIC CARDS -->
+    <section class="dash-stats-grid" aria-label="Ringkasan Statistik Equipment">
+        <a href="{{ route('equipment.index') }}" class="stat-card">
+            <div>
+                <div class="stat-title">Total Equipment</div>
+                <div class="stat-number primary">{{ $stats['total'] }}</div>
+                <div class="stat-caption">Total equipment terdaftar</div>
+            </div>
+            <div class="stat-icon-box primary">
+                <i data-lucide="package" style="width:20px;height:20px;"></i>
+            </div>
+        </a>
 
-    <!-- SIDEBAR -->
-    @include('partials.sidebar')
+        <a href="{{ route('equipment.index', ['status' => 'available']) }}" class="stat-card">
+            <div>
+                <div class="stat-title">Di Workshop</div>
+                <div class="stat-number success">{{ $stats['di_workshop'] }}</div>
+                <div class="stat-caption">Equipment berada di workshop</div>
+            </div>
+            <div class="stat-icon-box success">
+                <i data-lucide="check-circle-2" style="width:20px;height:20px;"></i>
+            </div>
+        </a>
 
-    <!-- MAIN -->
-    <div class="main-content">
+        <a href="{{ route('equipment.index', ['status' => 'borrowed']) }}" class="stat-card">
+            <div>
+                <div class="stat-title">Di Luar Workshop</div>
+                <div class="stat-number warning">{{ $stats['di_luar'] }}</div>
+                <div class="stat-caption">Equipment berada di luar workshop</div>
+            </div>
+            <div class="stat-icon-box warning">
+                <i data-lucide="arrow-up-right" style="width:20px;height:20px;"></i>
+            </div>
+        </a>
+    </section>
 
-        <!-- TOPBAR -->
-        <header class="topbar">
-            <div class="topbar-left">
-                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">
-                    <i class="ri-menu-line"></i>
-                </button>
-
-                <div class="topbar-title">
-                    <h2>Dashboard</h2>
-                    <p>Ringkasan monitoring equipment</p>
-                </div>
+    <!-- 2. MAIN CONTENT GRID -->
+    <div class="dash-main-grid">
+        <!-- KOLOM KIRI: AKTIVITAS EQUIPMENT TERBARU -->
+        <section class="wt-card">
+            <div class="card-header-flex">
+                <h2 class="card-heading">Aktivitas Equipment Terbaru</h2>
+                <a href="{{ route('riwayat.index') }}" class="card-action-link">Lihat Semua</a>
             </div>
 
-            <div class="topbar-right">
-                <a href="{{ route('notifikasi.index') }}"
-                   class="notif-btn"
-                   id="notifBtn"
-                   aria-label="Notifikasi">
-                    <i class="ri-notification-3-line"></i>
-                    <span class="notif-badge"></span>
-                </a>
-
-                <div class="user-info" id="userMenu">
-                    <div class="user-avatar">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
-                    </div>
-
-                    <div class="user-details">
-                        <span class="user-name">{{ Auth::user()->name }}</span>
-                        <span class="user-role">Administrator</span>
-                    </div>
-
-                    <i class="ri-arrow-down-s-line"
-                       style="color: var(--text-muted); font-size: 16px;"></i>
-                </div>
-            </div>
-        </header>
-
-        <!-- PAGE CONTENT -->
-        <main class="page-content">
-
-            <!-- ── STAT CARDS ───────────────────── -->
-            <div class="stats-grid">
-
-                <!-- Total Equipment -->
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <span class="stat-label">Total Equipment</span>
-
-                        <div class="stat-icon total">
-                            <i class="ri-archive-line"></i>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="stat-value">
-                            {{ $stats['total'] }}
-                        </div>
-
-                        <div class="stat-sub">
-                            Seluruh equipment terdaftar
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Equipment Keluar -->
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <span class="stat-label">Equipment Keluar</span>
-
-                        <div class="stat-icon out">
-                            <i class="ri-logout-box-line"></i>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="stat-value">
-                            {{ $stats['keluar'] }}
-                        </div>
-
-                        <div class="stat-sub warning">
-                            {{ $stats['total'] > 0 ? round(($stats['keluar'] / $stats['total']) * 100) : 0 }}% dari total
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Equipment Di Workshop -->
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <span class="stat-label">Di Workshop</span>
-
-                        <div class="stat-icon workshop">
-                            <i class="ri-home-office-line"></i>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="stat-value">
-                            {{ $stats['workshop'] }}
-                        </div>
-
-                        <div class="stat-sub success">
-                            Sedang berada di workshop
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- ── BOTTOM GRID ──────────────────── -->
-            <div class="bottom-grid">
-
-                <!-- Status Equipment -->
-                <div class="section-card">
-                    <div class="section-title">
-                        Status Equipment
-                    </div>
-
-                    <div class="status-chart-wrapper">
-
-                        <div class="donut-container">
-                            <svg class="donut-svg" viewBox="0 0 100 100">
-                                <circle
-                                    class="donut-track"
-                                    cx="50"
-                                    cy="50"
-                                    r="40"
-                                />
-
-                                <circle
-                                    class="donut-out"
-                                    cx="50"
-                                    cy="50"
-                                    r="40"
-                                />
-
-                                <circle
-                                    class="donut-workshop"
-                                    cx="50"
-                                    cy="50"
-                                    r="40"
-                                />
-                            </svg>
-
-                            <div class="donut-center">
-                                <div class="donut-pct">
-                                    {{ $stats['total'] > 0 ? round(($stats['keluar'] / $stats['total']) * 100) : 0 }}%
-                                </div>
-
-                                <div class="donut-desc">
-                                    equipment keluar
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="status-legend">
-
-                            <!-- Keluar -->
-                            <div class="legend-item">
-                                <div class="legend-dot-label">
-                                    <div class="legend-dot dot-out"></div>
-                                    Equipment Keluar
-                                </div>
-
-                                <span class="legend-val">
-                                    {{ $stats['keluar'] }}
-                                </span>
-                            </div>
-
-                            <!-- Di Workshop -->
-                            <div class="legend-item">
-                                <div class="legend-dot-label">
-                                    <div class="legend-dot dot-workshop"></div>
-                                    Di Workshop
-                                </div>
-
-                                <span class="legend-val">
-                                    {{ $stats['workshop'] }}
-                                </span>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Aktivitas Terbaru -->
-                <div class="section-card">
-
-                    <div class="activity-header">
-                        <div class="section-title">
-                            Aktivitas Terbaru
-                        </div>
-
-                        <a href="{{ route('laporan.index') }}"
-                           class="link-all">
-                            Lihat semua
-                        </a>
-                    </div>
-
-                    <div class="activity-list">
-
-                        @forelse($aktivitas as $item)
-
-                        <div class="activity-item">
-                            <div class="activity-dot"></div>
-
-                            <div>
-                                <div class="activity-text">
-                                    {{ $item['text'] }}
-                                </div>
-
-                                <div class="activity-time">
-                                    {{ $item['time'] }}
-                                </div>
-                            </div>
-                        </div>
-
-                        @empty
-
-                        <p style="color:var(--text-muted); font-size:13px;">
-                            Belum ada aktivitas terbaru.
-                        </p>
-
-                        @endforelse
-
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- ── EQUIPMENT TABLE ──────────────── -->
-            <div class="table-card">
-
-                <div class="table-header">
-                    <div class="section-title">
-                        Equipment Terbaru
-                    </div>
-
-                    <a href="{{ route('equipment.index') }}"
-                       class="link-all">
-                        Lihat semua equipment
-                    </a>
-                </div>
-
-                <div style="overflow-x: auto;">
-
-                    <table class="data-table">
-
+            @if($aktivitasTerbaru->count() > 0)
+                <div class="table-responsive">
+                    <table class="wt-table">
                         <thead>
                             <tr>
                                 <th>Nama Equipment</th>
-                                <th>Kode</th>
-                                <th>Lokasi</th>
-                                <th>Status</th>
+                                <th>Kode Equipment</th>
+                                <th>Pergerakan</th>
+                                <th>Waktu</th>
+                                <th>Pengguna</th>
                             </tr>
                         </thead>
-
                         <tbody>
-
-                            @forelse($equipmentTerbaru as $eq)
-
-                            @php
-                                $badgeClass = match($eq['status']) {
-                                    'Keluar'       => 'badge-out',
-                                    'Di Workshop'  => 'badge-workshop',
-                                    default        => 'badge-workshop',
-                                };
-                            @endphp
-
-                            <tr>
-
-                                <td>
-                                    <span class="equipment-name">
-                                        {{ $eq['nama'] }}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <span class="equipment-code">
-                                        {{ $eq['kode'] }}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    {{ $eq['lokasi'] }}
-                                </td>
-
-                                <td>
-                                    <span class="badge {{ $badgeClass }}">
-                                        {{ $eq['status'] }}
-                                    </span>
-                                </td>
-
-                            </tr>
-
-                            @empty
-
-                            <tr>
-                                <td colspan="4"
-                                    style="text-align:center; color:var(--text-muted); padding:28px;">
-                                    Belum ada data equipment.
-                                </td>
-                            </tr>
-
-                            @endforelse
-
+                            @foreach($aktivitasTerbaru as $item)
+                                <tr>
+                                    <td style="font-weight: 500;">{{ $item['nama'] }}</td>
+                                    <td><span class="font-mono">{{ $item['kode'] }}</span></td>
+                                    <td>
+                                        @if($item['type'] === 'in')
+                                            <span class="badge badge-success">
+                                                <i data-lucide="arrow-down-left" style="width:13px;height:13px;"></i>
+                                                Masuk
+                                            </span>
+                                        @else
+                                            <span class="badge badge-warning">
+                                                <i data-lucide="arrow-up-right" style="width:13px;height:13px;"></i>
+                                                Keluar
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td style="color: var(--text-secondary); white-space: nowrap;">{{ $item['waktu'] }}</td>
+                                    <td style="color: var(--text-secondary);">{{ $item['pengguna'] }}</td>
+                                </tr>
+                            @endforeach
                         </tbody>
-
                     </table>
-
                 </div>
-            </div>
+            @else
+                <div class="empty-state-box">
+                    <div class="empty-state-icon">
+                        <i data-lucide="history" style="width:22px;height:22px;"></i>
+                    </div>
+                    <p style="font-weight:600; color:var(--text-main); margin-bottom:4px;">Belum ada riwayat transaksi equipment.</p>
+                    <p style="font-size:13px; color:var(--text-secondary);">Aktivitas keluar-masuk akan muncul secara otomatis setelah ada transaksi tercatat.</p>
+                </div>
+            @endif
+        </section>
 
-        </main>
+        <!-- KOLOM KANAN: STATUS PERANGKAT IOT & NOTIFIKASI TERBARU -->
+        <div class="dash-right-stack">
+            <!-- Status Perangkat IoT -->
+            <section class="wt-card">
+                <div class="card-header-flex">
+                    <h2 class="card-heading">Status Perangkat IoT</h2>
+                    <a href="{{ route('monitoring-iot.index') }}" class="card-action-link">Monitoring IoT</a>
+                </div>
+
+                @foreach($iotDevices as $device)
+                    <div class="iot-device-item">
+                        <div class="iot-device-top">
+                            <div class="iot-device-info">
+                                <div class="iot-icon-circle {{ $device['status'] }}">
+                                    <i data-lucide="radio-tower" style="width:18px;height:18px;"></i>
+                                </div>
+                                <div>
+                                    <div class="iot-device-name">{{ $device['name'] }}</div>
+                                    <div class="iot-device-loc">{{ $device['location'] }}</div>
+                                </div>
+                            </div>
+
+                            @if($device['status'] === 'online')
+                                <span class="badge badge-success">
+                                    <i data-lucide="check-circle-2" style="width:13px;height:13px;"></i>
+                                    Online
+                                </span>
+                            @else
+                                <span class="badge badge-danger">
+                                    <i data-lucide="x-circle" style="width:13px;height:13px;"></i>
+                                    Offline
+                                </span>
+                            @endif
+                        </div>
+
+                        <div class="iot-last-seen">
+                            Terakhir terhubung: {{ $device['last_seen'] }}
+                        </div>
+
+                        @if($device['status'] !== 'online')
+                            <div class="iot-alert-box">
+                                {{ $device['message'] }}
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </section>
+
+            <!-- Notifikasi Terbaru -->
+            <section class="wt-card">
+                <div class="card-header-flex">
+                    <h2 class="card-heading">Notifikasi Terbaru</h2>
+                </div>
+
+                <div class="notif-list">
+                    @foreach($notifikasi as $notif)
+                        <div class="notif-item">
+                            <div class="notif-icon {{ $notif['type'] }}">
+                                @if($notif['type'] === 'success')
+                                    <i data-lucide="arrow-down-left" style="width:14px;height:14px;"></i>
+                                @elseif($notif['type'] === 'warning')
+                                    <i data-lucide="arrow-up-right" style="width:14px;height:14px;"></i>
+                                @else
+                                    <i data-lucide="alert-circle" style="width:14px;height:14px;"></i>
+                                @endif
+                            </div>
+                            <div>
+                                <div class="notif-msg">{{ $notif['message'] }}</div>
+                                <div class="notif-time">{{ $notif['time'] }}</div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        </div>
     </div>
-
-</div>
 @endsection
-
-@section('scripts')
-<script>
-    // Sidebar toggle (mobile)
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    const sidebar      = document.getElementById('sidebar');
-    const sidebarClose = document.getElementById('sidebarClose');
-    const overlay      = document.getElementById('sidebarOverlay');
-
-    function openSidebar() {
-        sidebar?.classList.add('open');
-        overlay?.classList.add('open');
-    }
-
-    function closeSidebar() {
-        sidebar?.classList.remove('open');
-        overlay?.classList.remove('open');
-    }
-
-    hamburgerBtn?.addEventListener('click', openSidebar);
-    sidebarClose?.addEventListener('click', closeSidebar);
-    overlay?.addEventListener('click', closeSidebar);
-
-    // Donut chart animation on load
-    window.addEventListener('load', () => {
-        const circles = document.querySelectorAll(
-            '.donut-out, .donut-workshop'
-        );
-
-        circles.forEach(circle => {
-            const offset = parseFloat(
-                circle.style.strokeDashoffset ||
-                circle.getAttribute('stroke-dashoffset') ||
-                getComputedStyle(circle).strokeDashoffset
-            );
-        });
-    });
-</script>
-@endsection
-```
