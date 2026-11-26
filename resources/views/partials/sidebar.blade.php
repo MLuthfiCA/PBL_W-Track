@@ -1,64 +1,70 @@
 <aside class="sidebar" id="sidebar">
-    <!-- Logo -->
-    <div class="sidebar-logo">
-        <div class="logo-icon-sm">
-            <i class="ri-tools-line"></i>
-        </div>
-        <span class="logo-text">W-Track</span>
-        <button class="sidebar-close" id="sidebarClose" aria-label="Tutup sidebar">
-            <i class="ri-close-line"></i>
+    <div class="sidebar-header">
+        <a href="{{ route('dashboard') }}" class="brand-box">
+            <div class="brand-logo">W</div>
+            <span class="brand-name">W-Track</span>
+        </a>
+        <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Tutup menu">
+            <i data-lucide="x"></i>
         </button>
     </div>
 
-    <!-- Menu Utama -->
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" aria-label="Navigasi Utama">
         <ul class="nav-list">
-            <li class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                <a href="{{ route('dashboard') }}" class="nav-link">
-                    <i class="ri-dashboard-3-line nav-icon"></i>
-                    <span class="nav-label">Dashboard</span>
+            <li>
+                <a href="{{ route('dashboard') }}"
+                   class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
                 </a>
             </li>
-            <li class="nav-item {{ request()->routeIs('equipment*') ? 'active' : '' }}">
-                <a href="{{ route('equipment.index') }}" class="nav-link">
-                    <i class="ri-box-3-line nav-icon"></i>
-                    <span class="nav-label">Equipment</span>
+            <li>
+                <a href="{{ route('equipment.index') }}"
+                   class="nav-link {{ request()->routeIs('equipment.*') ? 'active' : '' }}">
+                    <i data-lucide="package"></i>
+                    <span>Equipment</span>
                 </a>
             </li>
-            <li class="nav-item {{ request()->routeIs('pemeliharaan*') ? 'active' : '' }}">
-                <a href="{{ route('pemeliharaan.index') }}" class="nav-link">
-                    <i class="ri-tools-fill nav-icon"></i>
-                    <span class="nav-label">Pemeliharaan</span>
+            <li>
+                <a href="{{ route('monitoring-iot.index') }}"
+                   class="nav-link {{ request()->routeIs('monitoring-iot.*') ? 'active' : '' }}">
+                    <i data-lucide="radio-tower"></i>
+                    <span>Monitoring IoT</span>
                 </a>
             </li>
-            <li class="nav-item {{ request()->routeIs('laporan*') ? 'active' : '' }}">
-                <a href="{{ route('laporan.index') }}" class="nav-link">
-                    <i class="ri-bar-chart-2-line nav-icon"></i>
-                    <span class="nav-label">Laporan</span>
+            <li>
+                <a href="{{ route('transaksi.index') }}"
+                   class="nav-link {{ request()->routeIs('transaksi.*') ? 'active' : '' }}">
+                    <i data-lucide="arrow-left-right"></i>
+                    <span>Transaksi</span>
                 </a>
             </li>
-        </ul>
-
-        <!-- Section Sistem -->
-        <div class="nav-section-label">SISTEM</div>
-        <ul class="nav-list">
-            <li class="nav-item {{ request()->routeIs('pengaturan*') ? 'active' : '' }}">
-                <a href="{{ route('pengaturan.index') }}" class="nav-link">
-                    <i class="ri-settings-3-line nav-icon"></i>
-                    <span class="nav-label">Pengaturan</span>
+            <li>
+                <a href="{{ route('riwayat.index') }}"
+                   class="nav-link {{ request()->routeIs('riwayat.*') ? 'active' : '' }}">
+                    <i data-lucide="history"></i>
+                    <span>Riwayat</span>
                 </a>
-            </li>
-            <li class="nav-item">
-                <form method="POST" action="{{ route('logout') }}" id="logoutForm">
-                    @csrf
-                    <button type="submit" class="nav-link nav-logout" onclick="return confirm('Yakin ingin keluar?')">
-                        <i class="ri-logout-box-r-line nav-icon"></i>
-                        <span class="nav-label">Keluar</span>
-                    </button>
-                </form>
             </li>
         </ul>
     </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar-sm">
+                <i data-lucide="user-round" style="width:18px;height:18px;"></i>
+            </div>
+            <span class="user-name-label">{{ Auth::user()->name ?? 'Staff Admin' }}</span>
+        </div>
+
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="btn-logout-icon" aria-label="Keluar" title="Keluar dari aplikasi"
+                    onclick="return confirm('Yakin ingin keluar dari W-Track?')">
+                <i data-lucide="log-out" style="width:18px;height:18px;"></i>
+            </button>
+        </form>
+    </div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>

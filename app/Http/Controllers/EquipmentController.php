@@ -8,74 +8,96 @@ use Illuminate\Http\Request;
 class EquipmentController extends Controller
 {
     /**
-     * Tampilkan daftar equipment.
+     * Tampilkan daftar equipment dengan dukungan pencarian dan filter status.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $equipment = Equipment::orderBy('created_at', 'desc')->get();
-        return view('equipment.index', compact('equipment'));
+        $query = Equipment::query();
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('rfid_uid', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status') && in_array($request->status, ['available', 'borrowed'])) {
+            $query->where('status', $request->status);
+        }
+
+        $equipments = $query->orderBy('created_at', 'desc')->get();
+
+        return view('equipment.index', compact('equipments'));
     }
 
     /**
-     * Simpan equipment baru beserta validasi UID RFID.
+     * Simpan data equipment baru ke database.
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'category'    => 'required|string|max:255',
-            'rfid_uid'    => 'required|string|max:255|unique:equipments,rfid_uid',
+            'name'     => 'required|string|max:150',
+            'rfid_uid' => 'required|string|max:50|unique:equipments,rfid_uid',
+            'category' => 'required|string|max:100',
         ], [
             'name.required'     => 'Nama equipment wajib diisi.',
-            'category.required' => 'Kategori wajib diisi.',
             'rfid_uid.required' => 'UID Tag RFID wajib diisi.',
-            'rfid_uid.unique'   => 'UID RFID ini sudah terdaftar pada alat lain!',
+            'rfid_uid.unique'   => 'UID Tag RFID sudah terdaftar pada equipment lain.',
+            'category.required' => 'Kategori equipment wajib dipilih.',
         ]);
 
         Equipment::create([
             'name'     => $validated['name'],
+            'rfid_uid' => strtoupper(trim($validated['rfid_uid'])),
             'category' => $validated['category'],
-            'rfid_uid' => $validated['rfid_uid'],
-            'status'   => 'available', // Status awal default
+            'status'   => 'available',
         ]);
 
-        return redirect()->route('equipment.index')->with('success', 'Equipment berhasil ditambahkan!');
+        return redirect()
+            ->route('equipment.index')
+            ->with('success', 'Data equipment baru berhasil ditambahkan.');
     }
 
     /**
-     * Update data equipment.
+     * Perbarui data equipment yang sudah ada.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Equipment $equipment)
     {
-        $equipment = Equipment::findOrFail($id);
-
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'category'    => 'required|string|max:255',
-            'rfid_uid'    => 'required|string|max:255|unique:equipments,rfid_uid,' . $id,
-            'status'      => 'required|in:available,borrowed',
+            'name'     => 'required|string|max:150',
+            'rfid_uid' => 'required|string|max:50|unique:equipments,rfid_uid,' . $equipment->id,
+            'category' => 'required|string|max:100',
+            'status'   => 'required|in:available,borrowed',
         ], [
             'name.required'     => 'Nama equipment wajib diisi.',
-            'category.required' => 'Kategori wajib diisi.',
             'rfid_uid.required' => 'UID Tag RFID wajib diisi.',
-            'rfid_uid.unique'   => 'UID RFID ini sudah terdaftar pada alat lain!',
-            'status.required'   => 'Status wajib dipilih.',
-            'status.in'         => 'Status tidak valid.',
+            'rfid_uid.unique'   => 'UID Tag RFID sudah digunakan equipment lain.',
+            'category.required' => 'Kategori equipment wajib dipilih.',
         ]);
 
-        $equipment->update($validated);
+        $equipment->update([
+            'name'     => $validated['name'],
+            'rfid_uid' => strtoupper(trim($validated['rfid_uid'])),
+            'category' => $validated['category'],
+            'status'   => $validated['status'],
+        ]);
 
-        return redirect()->route('equipment.index')->with('success', 'Data equipment berhasil diperbarui!');
+        return redirect()
+            ->route('equipment.index')
+            ->with('success', 'Data equipment berhasil diperbarui.');
     }
 
     /**
-     * Hapus equipment dari database.
+     * Hapus data equipment.
      */
-    public function destroy($id)
+    public function destroy(Equipment $equipment)
     {
-        $equipment = Equipment::findOrFail($id);
         $equipment->delete();
 
-        return redirect()->route('equipment.index')->with('success', 'Equipment berhasil dihapus!');
+        return redirect()
+            ->route('equipment.index')
+            ->with('success', 'Data equipment berhasil dihapus.');
     }
 }

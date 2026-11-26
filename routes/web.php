@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\EquipmentController;
+use App\Http\Controllers\MonitoringIotController;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,7 +13,7 @@ use App\Http\Controllers\EquipmentController;
 |--------------------------------------------------------------------------
 */
 
-// Redirect root → login
+// Redirect root -> login
 Route::get('/', function () {
     return redirect()->route('login');
 });
@@ -28,9 +29,9 @@ Route::get('/password/reset', function () {
     return redirect()->route('login')->with('error', 'Fitur reset password belum tersedia.');
 })->name('password.request');
 
-// ── TRANSAKSI & RFID API (WTR-03) ───────────────────────
-// Endpoint ini dibuka agar dapat dipanggil oleh simulasi/sensor RFID tanpa terhalang auth session
+// ── TRANSAKSI & RFID API (WTR-03 & WTR-04) ──────────────
 Route::post('/scan-out', [TransactionController::class, 'scanOut'])->name('scan.out');
+Route::post('/scan-in', [TransactionController::class, 'scanIn'])->name('scan.in');
 
 // ── AUTHENTICATED ROUTES ────────────────────────────────
 Route::middleware('auth')->group(function () {
@@ -41,12 +42,22 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ── MASTER DATA EQUIPMENT (WTR-02) ───────────────────
-    Route::resource('equipment', EquipmentController::class);
+    // Menu Utama Design Handoff
+    Route::get('/equipment', [EquipmentController::class, 'index'])->name('equipment.index');
+    Route::post('/equipment', [EquipmentController::class, 'store'])->name('equipment.store');
+    Route::put('/equipment/{equipment}', [EquipmentController::class, 'update'])->name('equipment.update');
+    Route::delete('/equipment/{equipment}', [EquipmentController::class, 'destroy'])->name('equipment.destroy');
 
-    // Placeholder routes (akan diisi di sprint berikutnya)
+    Route::get('/monitoring-iot', [MonitoringIotController::class, 'index'])->name('monitoring-iot.index');
+    Route::get('/notifikasi', [MonitoringIotController::class, 'notifications'])->name('notifikasi.index');
+
+    Route::get('/transaksi', [TransactionController::class, 'index'])->name('transaksi.index');
+    Route::post('/transaksi', [TransactionController::class, 'store'])->name('transaksi.store');
+
+    Route::get('/riwayat', [TransactionController::class, 'history'])->name('riwayat.index');
+
+    // Rute lama (dipertahankan sementara agar tidak error jika masih dipanggil)
     Route::get('/pemeliharaan', fn() => view('coming-soon', ['page' => 'Pemeliharaan']))->name('pemeliharaan.index');
     Route::get('/laporan',     fn() => view('coming-soon', ['page' => 'Laporan']))->name('laporan.index');
     Route::get('/pengaturan',  fn() => view('coming-soon', ['page' => 'Pengaturan']))->name('pengaturan.index');
-    Route::get('/notifikasi',  fn() => view('coming-soon', ['page' => 'Notifikasi']))->name('notifikasi.index');
 });
