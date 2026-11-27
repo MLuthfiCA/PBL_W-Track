@@ -31,6 +31,7 @@ Route::get('/password/reset', function () {
 
 // ── TRANSAKSI & RFID API (WTR-03) ───────────────────────
 Route::post('/scan-out', [TransactionController::class, 'scanOut'])->name('scan.out');
+Route::post('/api/scan', [TransactionController::class, 'storeFromIoT'])->name('api.scan');
 
 // ── AUTHENTICATED ROUTES ────────────────────────────────
 Route::middleware('auth')->group(function () {

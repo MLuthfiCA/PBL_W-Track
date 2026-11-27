@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
             'scan-out',
+            'api/scan',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
